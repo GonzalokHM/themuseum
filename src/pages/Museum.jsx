@@ -1,8 +1,16 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+import useMuseumNavigation from '../hooks/useMuseumNavigation';
+import { useGlobalState } from '../context/GlobalState';
+import GameLauncher from '../components/GameLauncher';
 
 const Museum = () => {
   const mountRef = useRef(null);
+  const [scene, setScene] = useState(null);
+  const [camera, setCamera] = useState(null);
+  const [renderer, setRenderer] = useState(null);
+  const { currentArtwork } = useMuseumNavigation(scene, camera, renderer);
+  const { state, dispatch } = useGlobalState();
 
   useEffect(() => {
     const mountNode = mountRef.current;
@@ -13,28 +21,57 @@ const Museum = () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     mountNode.appendChild(renderer.domElement);
 
-    const geometry = new THREE.BoxGeometry();
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    const cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
+        // Añadir cuadros en la pared
+        const createArtwork = (x, y, z, id, name) => {
+            const geometry = new THREE.PlaneGeometry(1, 1.5); // Tamaño del cuadro
+            const material = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
+            const artwork = new THREE.Mesh(geometry, material);
+            artwork.position.set(x, y, z);
+            artwork.userData = { id, name };
+            scene.add(artwork);
+          };
+      
+          createArtwork(-2, 0, -5, 'artwork-1', 'Obra de Arte 1');
+          createArtwork(0, 0, -5, 'artwork-2', 'Obra de Arte 2');
+          createArtwork(2, 0, -5, 'artwork-3', 'Obra de Arte 3');
 
-    camera.position.z = 5;
+    camera.position.z = 2;
 
     const animate = () => {
-      requestAnimationFrame(animate);
-      cube.rotation.x += 0.01;
-      cube.rotation.y += 0.01;
-      renderer.render(scene, camera);
-    };
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+      };
 
     animate();
+
+    setScene(scene);
+    setCamera(camera);
+    setRenderer(renderer);
+
+  
 
     return () => {
         mountNode.removeChild(renderer.domElement);
     };
   }, []);
 
-  return <div ref={mountRef}></div>;
-};
+  useEffect(() => {
+    if (currentArtwork) {
+      console.log('Obra de arte seleccionada:', currentArtwork.userData);
+      // Lógica adicional para mostrar detalles de la obra de arte
+    }
+  }, [currentArtwork]);
 
+
+  return(
+     <div ref={mountRef} style={{ width: '100vw', height: '100vh' }}>
+    {state.currentGame && (
+        <div className="game-overlay">
+          <GameLauncher artworkId={state.currentGame} />
+          <button onClick={() => dispatch({ type: 'END_GAME' })}>Cerrar Juego</button>
+        </div>
+      )}
+    </div>
+  );
+};
 export default Museum;
