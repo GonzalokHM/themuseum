@@ -1,9 +1,10 @@
-import { createContext, useReducer, useContext } from 'react';
+import { createContext, useReducer } from 'react';
 import PropTypes from 'prop-types';
 
 const initialState = {
   user: null,
   progress: {},
+  currentGame: null,
 };
 
 const reducer = (state, action) => {
@@ -21,7 +22,7 @@ const reducer = (state, action) => {
   }
 };
 
-const GlobalStateContext = createContext();
+export const GlobalStateContext = createContext();
 
 export const GlobalStateProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -36,5 +37,3 @@ export const GlobalStateProvider = ({ children }) => {
 GlobalStateProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
-
-export const useGlobalState = () => useContext(GlobalStateContext);
