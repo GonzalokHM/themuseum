@@ -11,7 +11,20 @@ const Museum = () => {
   const [renderer, setRenderer] = useState(null);
   const [selectedArtworkPosition, setSelectedArtworkPosition] = useState(null);
   const { state, dispatch } = useGlobalState();
-  const { currentArtwork } = useMuseumNavigation(scene, camera, renderer);
+  const { currentArtwork, resetCameraPosition } = useMuseumNavigation(scene, camera, renderer);
+
+  const scores = [
+    { game: 'puzzle', player: 'Alex', score: '2:28' },
+    { game: 'Juego 2', player: 'Emma', score: 950 },
+    { game: 'puzzle', player: 'Jack', score: 850 },
+    { game: 'Juego 3', player: 'Sophia', score: 900 },
+    { game: 'Juego 2', player: 'Liam', score: 750 },
+    { game: 'puzzle', player: 'Olivia', score: '2:35' },
+    { game: 'Juego 2', player: 'Noah', score: 920 },
+    { game: 'Juego 3', player: 'Ava', score: 880 },
+    { game: 'puzzle', player: 'Mason', score: '2:20' },
+    { game: 'Juego 3', player: 'Isabella', score: 830 }
+  ];
 
   useEffect(() => {
     const mountNode = mountRef.current;
@@ -127,6 +140,8 @@ const Museum = () => {
         left: `${vector.x}px`,
         top: `${vector.y}px`
       });
+    }else {
+      setSelectedArtworkPosition(null); // Ocultar la interfaz del cuadro seleccionado
     }
   }, [currentArtwork, renderer, camera]);
 
@@ -139,22 +154,19 @@ const Museum = () => {
             position: 'absolute',
             left: selectedArtworkPosition.left,
             top: selectedArtworkPosition.top,
-            width: '200px',
-            height: '300px',
-            backgroundColor: 'rgba(255, 255, 255, 0.8)',
             padding: '10px',
-            boxShadow: '0 0 10px rgba(0,0,0,0.5)',
             transform: 'translate(-50%, -50%)'
           }}
         >
           <h2>Detalles de la Obra de Arte</h2>
-          <p>Nombre: {currentArtwork.userData.name}</p>
+          <p>Nombre: {currentArtwork?.userData.name}</p>
           {state.currentGame && (
             <div className="game-overlay">
               <GameLauncher artworkId={state.currentGame} />
               <button onClick={() => dispatch({ type: 'END_GAME' })}>Cerrar Juego</button>
             </div>
           )}
+      <button className='backHallButton' onClick={resetCameraPosition} style={{ position: 'absolute', bottom: -20, right: -120 }}>Volver al pasillo</button>
         </div>
       )}
     </div>

@@ -50,11 +50,11 @@ const useMuseumNavigation = (scene, camera, renderer) => {
       const targetPosition = new THREE.Vector3();
       artwork.getWorldPosition(targetPosition);
       // Ajustar la posición de la cámara para que esté un poco alejada del cuadro
-      const offset = new THREE.Vector3(2, 0, 0); // Ajustar según la distancia deseada
+      const offset = new THREE.Vector3(2, 0, 0);
       if (artwork.rotation.y === Math.PI / 2) {
-        offset.set(2, 0, 0); // Si el cuadro está en la pared izquierda
+        offset.set(1.1, 0, 0); // Si el cuadro está en la pared izquierda
       } else if (artwork.rotation.y === -Math.PI / 2) {
-        offset.set(-2, 0, 0); // Si el cuadro está en la pared derecha
+        offset.set(-1, 0, 0); // Si el cuadro está en la pared derecha
       }
       targetPosition.add(offset);
 
@@ -80,13 +80,33 @@ const useMuseumNavigation = (scene, camera, renderer) => {
     [camera, renderer, scene, dispatch]
   );
 
+  const resetCameraPosition = useCallback(() => {
+    setCurrentArtwork(null)
+    dispatch({ type: 'END_GAME' });
+    const initialPosition = new THREE.Vector3(0, 0, 5);
+    const animateCamera = () => { 
+      camera.position.lerp(initialPosition, 0.1);
+      camera.lookAt(new THREE.Vector3(0, 0, 0));
+      renderer.render(scene, camera);
+      if (camera.position.distanceTo(initialPosition) > 0.05) {
+        animationRef.current = requestAnimationFrame(animateCamera);
+      } else {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+
+    cancelAnimationFrame(animationRef.current);
+    animateCamera();
+  }, [camera, renderer, scene, dispatch]);
+
+
   useEffect(() => {
     if (currentArtwork) {
       moveCameraToArtwork(currentArtwork);
     }
   }, [currentArtwork, moveCameraToArtwork]);
 
-  return { currentArtwork };
+  return { currentArtwork, resetCameraPosition};
 };
 
 export default useMuseumNavigation;
