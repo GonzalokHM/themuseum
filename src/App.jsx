@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import Home from './pages/Home';
-import Museum from './pages/Museum';
-import ArtworkDetail from './pages/ArtWorkDetail';
-import UserProfile from './pages/UserProfile';
-import Settings from './pages/Settings';
+import Header from './components/Header/Header';
+import Footer from './components/Footer/Footer';
+import Home from './pages/Home/Home';
+import Museum from './pages/Museum/Museum';
+import ArtworkDetail from './pages/ArtWorkDetail/ArtWorkDetail';
+import UserProfile from './pages/UserProfile/UserProfile';
+import Settings from './pages/Settings/Settings';
 import { GlobalStateProvider } from './context/GlobalStateProvider';
 
 function App() {

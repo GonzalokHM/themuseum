@@ -25,9 +25,12 @@ const useMuseumNavigation = (scene, camera, renderer) => {
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     };
 
-    const onDocumentClick = () => {
+    const onDocumentClick = (event) => {
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
       raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(scene.children);
+      const intersects = raycaster.intersectObjects(scene.children,true);
       if (intersects.length > 0) {
         const intersectedObject = intersects[0].object;
         if (intersectedObject.userData.id) {
@@ -67,9 +70,13 @@ const useMuseumNavigation = (scene, camera, renderer) => {
         } else {
           cancelAnimationFrame(animationRef.current);
           setTimeout(() => {
+            if (state.currentGame !== artwork.userData.id){
             // Lanzar el juego correspondiente después de 3 segundos
             alert(`Lanzando el juego para ${artwork.userData.name}`);
             dispatch({ type: 'LAUNCH_GAME', payload: artwork.userData.id });
+          } else {
+            alert(`El juego para ${artwork.userData.name} ya está lanzado`);
+          }
           }, 3000);
         }
       };

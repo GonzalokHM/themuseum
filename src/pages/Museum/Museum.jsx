@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import useMuseumNavigation from '../hooks/useMuseumNavigation';
-import { useGlobalState } from '../context/useGlobalState';
-import GameLauncher from '../components/GameLauncher';
+import useMuseumNavigation from '../../hooks/useMuseumNavigation';
+import { useGlobalState } from '../../context/useGlobalState';
+import GameLauncher from '../../components/Games/GameLauncher';
+import HallOfFame from '../../components/HallOfFame/HallOfFame';
+import { getHighScores , getUserScore } from '../utils/localStorageUtils';
+import styles from './Museum.module.css';
 
 const Museum = () => {
   const mountRef = useRef(null);
@@ -11,20 +14,14 @@ const Museum = () => {
   const [renderer, setRenderer] = useState(null);
   const [selectedArtworkPosition, setSelectedArtworkPosition] = useState(null);
   const { state, dispatch } = useGlobalState();
-  const { currentArtwork, resetCameraPosition } = useMuseumNavigation(scene, camera, renderer);
+  const { currentArtwork, resetCameraPosition } = useMuseumNavigation(
+    scene,
+    camera,
+    renderer
+  );
 
-  const scores = [
-    { game: 'puzzle', player: 'Alex', score: '2:28' },
-    { game: 'Juego 2', player: 'Emma', score: 950 },
-    { game: 'puzzle', player: 'Jack', score: 850 },
-    { game: 'Juego 3', player: 'Sophia', score: 900 },
-    { game: 'Juego 2', player: 'Liam', score: 750 },
-    { game: 'puzzle', player: 'Olivia', score: '2:35' },
-    { game: 'Juego 2', player: 'Noah', score: 920 },
-    { game: 'Juego 3', player: 'Ava', score: 880 },
-    { game: 'puzzle', player: 'Mason', score: '2:20' },
-    { game: 'Juego 3', player: 'Isabella', score: 830 }
-  ];
+  const username = 'User';
+
 
   useEffect(() => {
     const mountNode = mountRef.current;
@@ -71,7 +68,7 @@ const Museum = () => {
       });
       const artwork = new THREE.Mesh(geometry, material);
       artwork.position.set(x, y, z);
-       artwork.rotation.y = Math.PI / 2;
+      artwork.rotation.y = Math.PI / 2;
       artwork.userData = { id, name };
 
       // Crear marco 3D para el cuadro
@@ -79,16 +76,18 @@ const Museum = () => {
       const frameDepth = 0.05;
 
       // Lados del marco
-      const topBottomGeometry = new THREE.BoxGeometry(1 + frameThickness * 2, frameDepth, frameThickness);
+      const topBottomGeometry = new THREE.BoxGeometry(
+        1 + frameThickness * 2,
+        frameDepth,
+        frameThickness
+      );
       const frameMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
-
 
       const topFrame = new THREE.Mesh(topBottomGeometry, frameMaterial);
       topFrame.position.set(x, y + 0.75, z + frameDepth / 2);
 
       const bottomFrame = new THREE.Mesh(topBottomGeometry, frameMaterial);
       bottomFrame.position.set(x, y - 0.75, z + frameDepth / 2);
-
 
       topFrame.rotation.y = Math.PI / 2;
       bottomFrame.rotation.y = Math.PI / 2;
@@ -102,6 +101,25 @@ const Museum = () => {
     createArtwork(-4.9, 0, -2, 'artwork-1', 'Obra de Arte 1');
     createArtwork(-4.9, 0, 0, 'artwork-2', 'Obra de Arte 2');
     createArtwork(-4.9, 0, 2, 'artwork-3', 'Obra de Arte 3');
+
+        // Cuadros en la pared derecha (Hall of Fame)
+        const createHallOfFame = (x, y, z, id) => {
+          const geometry = new THREE.PlaneGeometry(2, 1); // Tamaño del cuadro
+          const material = new THREE.MeshBasicMaterial({ color: 0xffff00, side: THREE.DoubleSide });
+          const artwork = new THREE.Mesh(geometry, material);
+          artwork.position.set(x, y, z);
+          artwork.userData = { id };
+    
+          // Rotar el cuadro para que esté paralelo a la pared
+          artwork.rotation.y = -Math.PI / 2;
+    
+          scene.add(artwork);
+        };
+    
+        createHallOfFame(4.9, 2, -2, 'game-1');
+        createHallOfFame(4.9, 1, -2, 'game-2');
+        createHallOfFame(4.9, 0, -2, 'game-3');
+    
 
     // Configuración de la cámara
     camera.position.set(0, 0, 5);
@@ -117,7 +135,20 @@ const Museum = () => {
     setCamera(camera);
     setRenderer(renderer);
 
+    // Función para manejar el redimensionamiento de la ventana
+    const handleResize = () => {
+      const width = mountNode.clientWidth;
+      const height = mountNode.clientHeight;
+      renderer.setSize(width, height);
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+    };
+
+    // Escuchar el evento de redimensionamiento de la ventana
+    window.addEventListener('resize', handleResize);
+
     return () => {
+      window.removeEventListener('resize', handleResize);
       mountNode.removeChild(renderer.domElement);
     };
   }, []);
@@ -133,42 +164,56 @@ const Museum = () => {
 
       vector.project(camera);
 
-      vector.x = (vector.x * widthHalf) + widthHalf;
+      vector.x = vector.x * widthHalf + widthHalf;
       vector.y = -(vector.y * heightHalf) + heightHalf;
 
       setSelectedArtworkPosition({
         left: `${vector.x}px`,
-        top: `${vector.y}px`
+        top: `${vector.y}px`,
       });
-    }else {
+    } else {
       setSelectedArtworkPosition(null); // Ocultar la interfaz del cuadro seleccionado
     }
   }, [currentArtwork, renderer, camera]);
 
   return (
-    <div ref={mountRef} style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+    <div ref={mountRef} className={styles.museum}>
       {selectedArtworkPosition && (
         <div
-          className="artwork-overlay"
+          className={styles.artworkOverlay}
           style={{
-            position: 'absolute',
             left: selectedArtworkPosition.left,
             top: selectedArtworkPosition.top,
-            padding: '10px',
-            transform: 'translate(-50%, -50%)'
           }}
         >
           <h2>Detalles de la Obra de Arte</h2>
           <p>Nombre: {currentArtwork?.userData.name}</p>
           {state.currentGame && (
-            <div className="game-overlay">
+            <div className={styles.gameOverlay}>
               <GameLauncher artworkId={state.currentGame} />
-              <button onClick={() => dispatch({ type: 'END_GAME' })}>Cerrar Juego</button>
+              <button onClick={() => dispatch({ type: 'END_GAME' })}>
+                Cerrar Juego
+              </button>
             </div>
           )}
-      <button className='backHallButton' onClick={resetCameraPosition} style={{ position: 'absolute', bottom: -20, right: -120 }}>Volver al pasillo</button>
+          <button
+            className={styles.backHallButton}
+            onClick={resetCameraPosition}
+          >
+            Volver al pasillo
+          </button>
         </div>
       )}
+      <div className={styles.hallOfFameSection}>
+        {['game-1', 'game-2', 'game-3'].map(gameId => (
+          <HallOfFame
+            key={gameId}
+            gameId={gameId}
+            rankings={getHighScores(gameId)}
+            userScore={getUserScore(gameId, username) || { username, score: 0 }}
+          />
+        ))}
+      </div>
     </div>
   );
 };

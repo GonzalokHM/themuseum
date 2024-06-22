@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
-import MinigamePuzzle from './GamePuzzle';
+import MinigamePuzzle from './Puzzle/GamePuzzle';
+
 
 const GameLauncher = ({ artworkId }) => {
   switch (artworkId) {
