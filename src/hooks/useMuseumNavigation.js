@@ -69,22 +69,17 @@ const useMuseumNavigation = (scene, camera, renderer) => {
           animationRef.current = requestAnimationFrame(animateCamera);
         } else {
           cancelAnimationFrame(animationRef.current);
-          setTimeout(() => {
-            if (state.currentGame !== artwork.userData.id){
-            // Lanzar el juego correspondiente después de 3 segundos
-            alert(`Lanzando el juego para ${artwork.userData.name}`);
+            if (!artwork.userData.isHallOfFame && state.currentGame !== artwork.userData.id){
+            // alert(`Lanzando el juego para ${artwork.userData.name}`);
             dispatch({ type: 'LAUNCH_GAME', payload: artwork.userData.id });
-          } else {
-            alert(`El juego para ${artwork.userData.name} ya está lanzado`);
           }
-          }, 3000);
         }
       };
 
       cancelAnimationFrame(animationRef.current);
       animateCamera();
     },
-    [camera, renderer, scene, dispatch]
+    [camera, renderer, scene, dispatch, state.currentGame]
   );
 
   const resetCameraPosition = useCallback(() => {

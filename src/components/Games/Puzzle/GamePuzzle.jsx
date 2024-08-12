@@ -1,13 +1,28 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import PropTypes from 'prop-types';
 import './gamePuzzle.css';
 
-const MinigamePuzzle = () => {
+const MinigamePuzzle = ({ onGameEnd }) => {
   const [pieces, setPieces] = useState(shufflePieces());
   const [isSolved, setIsSolved] = useState(false);
+  const [startTime, setStartTime] = useState(Date.now()); 
+  const [elapsedTime, setElapsedTime] = useState({ minutes: 0, seconds: 0 });
+  const timerRef = useRef(null);
 
   useEffect(() => {
     checkSolution();
   }, [pieces]);
+
+  useEffect(() => {
+    setStartTime(Date.now());
+    timerRef.current = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const minutes = Math.floor(elapsed / 60000);
+      const seconds = Math.floor((elapsed % 60000) / 1000);
+      setElapsedTime({ minutes, seconds });
+    }, 1000);
+    return () => clearInterval(timerRef.current);
+  }, [startTime]); 
 
   const handlePieceClick = (index) => {
     const emptyIndex = pieces.indexOf(null);
@@ -23,12 +38,18 @@ const MinigamePuzzle = () => {
   const checkSolution = () => {
     const solved = pieces.slice(0, -1).every((piece, index) => piece === index + 1);
     setIsSolved(solved);
+    if (solved) {
+      clearInterval(timerRef.current);
+      const score = `${elapsedTime.minutes} min ${elapsedTime.seconds} s`;
+      onGameEnd(score);
+    }
   };
 
   return (
     <div>
       <h2>Rompecabezas</h2>
       {isSolved ? <p>¡Felicidades, has resuelto el rompecabezas!</p> : null}
+      <div id="timer">{elapsedTime.minutes} min {elapsedTime.seconds} s</div>
       <div className="puzzle">
         {pieces.map((piece, index) => (
           <div
@@ -51,6 +72,10 @@ const shufflePieces = () => {
     [pieces[i], pieces[j]] = [pieces[j], pieces[i]];
   }
   return pieces;
+};
+
+MinigamePuzzle.propTypes = {
+  onGameEnd: PropTypes.func.isRequired,
 };
 
 export default MinigamePuzzle;

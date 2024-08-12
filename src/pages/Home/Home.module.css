@@ -15,6 +15,7 @@
     font-size: 18px;
     color: #666;
     line-height: 1.5;
+    padding: 50px 200px 50px 200px
   }
   
   .enterButton {
@@ -33,4 +34,22 @@
     background-color: #4834d4;
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(108, 92, 231, 0.5);
+  }
+
+  @media (max-width: 765px) {
+    .description{
+      padding: 50px 150px 50px 150px
+    }
+  }
+
+  @media (max-width: 509px) {
+    .description{
+      padding: 50px
+    }
+  }
+
+  @media (max-width: 310px) {
+    .description{
+      padding: 26px
+    }
   }
