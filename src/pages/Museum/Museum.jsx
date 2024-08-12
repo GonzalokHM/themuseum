@@ -16,6 +16,7 @@ const Museum = () => {
   const { state, dispatch } = useGlobalState();
   const [currentHallOfFame, setCurrentHallOfFame] = useState(null);
   const [hallOfFameIndex, setHallOfFameIndex] = useState(0);
+  const [showOverlay, setShowOverlay] = useState(false);
   const { currentArtwork, resetCameraPosition } = useMuseumNavigation(
     scene,
     camera,
@@ -23,20 +24,7 @@ const Museum = () => {
   );
 
   const username = state.user;
-
   const hallOfFameIds = ['hallPuzzle', 'hall2', 'hall3'];
-
-  const isCameraInPosition = (targetPosition) => {
-    const distance = camera.position.distanceTo(targetPosition);
-    const cameraDirection = new THREE.Vector3();
-    camera.getWorldDirection(cameraDirection);
-  
-    const targetDirection = targetPosition.clone().sub(camera.position).normalize();
-    const angle = cameraDirection.angleTo(targetDirection);
-  
-    // Si la distancia es pequeña y el ángulo entre la dirección de la cámara y el cuadro es pequeño
-    return distance < 2 && angle < 0.1;
-  };
 
   useEffect(() => {
     const mountNode = mountRef.current;
@@ -160,7 +148,6 @@ useEffect(() => {
     const artworkPosition = new THREE.Vector3();
     currentArtwork.getWorldPosition(artworkPosition);
 
-    if (isCameraInPosition(artworkPosition)) {
       const canvas = renderer.domElement;
       const widthHalf = canvas.clientWidth / 2;
       const heightHalf = canvas.clientHeight / 2;
@@ -174,9 +161,6 @@ useEffect(() => {
         left: `${x}px`,
         top: `${y}px`,
       });
-    } else {
-      setSelectedArtworkPosition(null);
-    }
 
     if (currentArtwork.userData.isHallOfFame) {
       setCurrentHallOfFame(currentArtwork.userData.id);
@@ -197,10 +181,7 @@ useEffect(() => {
       );
       const hallOfFamePosition = new THREE.Vector3();
       hallOfFameObject.getWorldPosition(hallOfFamePosition);
-  
-      if (isCameraInPosition(hallOfFamePosition)) {
-        // Mostrar overlay cuando la cámara está en posición
-      }
+
       if (hallOfFameObject) {
         hallOfFameObject.getWorldPosition(camera.position);
         camera.position.z = hallOfFameObject.position.z + 2; // Ajustar la posición de la cámara
@@ -215,7 +196,10 @@ useEffect(() => {
     
   };
 
+  
   const handleNextHallOfFame = () => {
+    setShowOverlay(false); // Ocultar el overlay antes de mover la cámara
+
     const nextIndex = (hallOfFameIndex + 1) % hallOfFameIds.length;
     setHallOfFameIndex(nextIndex);
     setCurrentHallOfFame(hallOfFameIds[nextIndex]);
@@ -223,58 +207,59 @@ useEffect(() => {
     const targetHallOfFame = scene.children.find(
       (child) => child.userData && child.userData.id === hallOfFameIds[nextIndex]
     );
-  
+
     if (targetHallOfFame) {
       const targetY = targetHallOfFame.position.y;
       const targetPosition = new THREE.Vector3(camera.position.x, targetY, targetHallOfFame.position.z + 2);
 
       const duration = 2; // Duración de la animación en segundos
       const frameRate = 60; // Cuántos cuadros por segundo
-  
+
       const animateCamera = () => {
- const startPosition = camera.position.clone();
-            let frame = 0;
+        const startPosition = camera.position.clone();
+        let frame = 0;
 
-            const intervalId = setInterval(() => {
-                frame++;
-                const t = frame / (duration * frameRate); // Valor de interpolación de 0 a 1
+        const intervalId = setInterval(() => {
+          frame++;
+          const t = frame / (duration * frameRate); // Valor de interpolación de 0 a 1
 
-                // Interpolación más suave con ease-in-out
-                const smoothT = t < 0.5 
-                  ? 2 * t * t 
-                  : -1 + (4 - 2 * t) * t;
+          // Interpolación más suave con ease-in-out
+          const smoothT = t < 0.5 
+            ? 2 * t * t 
+            : -1 + (4 - 2 * t) * t;
 
-                camera.position.lerpVectors(startPosition, targetPosition, smoothT);
-                camera.lookAt(targetHallOfFame.position);
-                renderer.render(scene, camera);
+          camera.position.lerpVectors(startPosition, targetPosition, smoothT);
+          camera.lookAt(targetHallOfFame.position);
+          renderer.render(scene, camera);
 
-                if (t >= 1) {
-                    clearInterval(intervalId);
-                }
-            }, 1000 / frameRate);
-        };
-  
+          if (t >= 1) {
+            clearInterval(intervalId);
+            setTimeout(() => setShowOverlay(true), 500);
+          }
+        }, 1000 / frameRate);
+      };
+
       animateCamera();
     }
   };
 
-useEffect(() => {
-  if (currentHallOfFame) {
-    const initialIndex = hallOfFameIds.indexOf(currentHallOfFame);
-    setHallOfFameIndex(initialIndex);
+  useEffect(() => {
+    if (currentHallOfFame) {
+      const initialIndex = hallOfFameIds.indexOf(currentHallOfFame);
+      setHallOfFameIndex(initialIndex);
 
-    const hallOfFameObject = scene.children.find(
-      (child) => child.userData && child.userData.id === currentHallOfFame
-    );
-    if (hallOfFameObject) {
-      hallOfFameObject.getWorldPosition(camera.position);
-      camera.position.y = hallOfFameObject.position.y;
-      camera.lookAt(hallOfFameObject.position);
-      camera.updateProjectionMatrix();
-      renderer.render(scene, camera); 
+      const hallOfFameObject = scene.children.find(
+        (child) => child.userData && child.userData.id === currentHallOfFame
+      );
+      if (hallOfFameObject) {
+        hallOfFameObject.getWorldPosition(camera.position);
+        camera.position.y = hallOfFameObject.position.y;
+        camera.lookAt(hallOfFameObject.position);
+        camera.updateProjectionMatrix();
+        renderer.render(scene, camera);
+      }
     }
-  }
-}, [currentHallOfFame, scene, camera, renderer]);
+  }, [currentHallOfFame, scene, camera, renderer]);
 
   // Manejar el evento de finalización del juego
   const handleGameEnd = () => {
@@ -310,7 +295,7 @@ useEffect(() => {
           </button>
         </div>
       )}
-      {currentHallOfFame && (
+      {currentHallOfFame && showOverlay && (
         <div className={styles.hallOfFameOverlay}>
           <HallOfFame
             gameId={currentHallOfFame}
