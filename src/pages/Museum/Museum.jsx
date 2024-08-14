@@ -16,7 +16,7 @@ const Museum = () => {
   const { state, dispatch } = useGlobalState();
   const [currentHallOfFame, setCurrentHallOfFame] = useState(null);
   const [hallOfFameIndex, setHallOfFameIndex] = useState(0);
-  const [showOverlay, setShowOverlay] = useState(false);
+  const [showOverlay, setShowOverlay] = useState(true);
   const { currentArtwork, resetCameraPosition } = useMuseumNavigation(
     scene,
     camera,
@@ -104,9 +104,7 @@ const Museum = () => {
     createArtwork(-4.9, 0, -3, 'puzzle', 'Obra de Arte 1');
     createArtwork(-4.9, 0, -1, 'game2', 'Obra de Arte 2');
     createArtwork(-4.9, 0, 1, 'game3', 'Obra de Arte 3');
-
     // cuadros Hall of Fame en la pared derecha
-
     createArtwork(4.9, 1.5, -2, 'hallPuzzle', 'Hall of Fame Puzzle', true);
     createArtwork(4.9, 0, -2, 'hall2', 'Hall of Fame game-2', true);
     createArtwork(4.9, -1.5, -2, 'hall3', 'Hall of Fame game-3', true);
@@ -179,16 +177,14 @@ useEffect(() => {
       const hallOfFameObject = scene.children.find(
         (child) => child.userData && child.userData.id === currentHallOfFame
       );
-      const hallOfFamePosition = new THREE.Vector3();
-      hallOfFameObject.getWorldPosition(hallOfFamePosition);
-
       if (hallOfFameObject) {
         hallOfFameObject.getWorldPosition(camera.position);
-        camera.position.z = hallOfFameObject.position.z + 2; // Ajustar la posición de la cámara
         camera.lookAt(hallOfFameObject.position);
+        camera.updateProjectionMatrix();
+        renderer.render(scene, camera);
       }
     }
-  }, [currentHallOfFame, scene, camera]);
+  }, [currentHallOfFame, scene, camera, renderer]);
 
   const handleResetCamera = () => {
     setCurrentHallOfFame(null);
@@ -210,56 +206,37 @@ useEffect(() => {
 
     if (targetHallOfFame) {
       const targetY = targetHallOfFame.position.y;
-      const targetPosition = new THREE.Vector3(camera.position.x, targetY, targetHallOfFame.position.z + 2);
+      const targetZ = targetHallOfFame.position.z;
+      const targetPosition = new THREE.Vector3(camera.position.x, targetY+0.1, targetZ+0.5);
 
       const duration = 2; // Duración de la animación en segundos
-      const frameRate = 60; // Cuántos cuadros por segundo
+      const startTime = performance.now()
 
-      const animateCamera = () => {
-        const startPosition = camera.position.clone();
-        let frame = 0;
-
-        const intervalId = setInterval(() => {
-          frame++;
-          const t = frame / (duration * frameRate); // Valor de interpolación de 0 a 1
-
+      const animateCamera = (time) => {
+      
+        const elapsed = (time - startTime) / 1000; // Convertimos a segundos
+        const t = elapsed / duration; // Valor de interpolación de 0 a 1
+   
           // Interpolación más suave con ease-in-out
           const smoothT = t < 0.5 
             ? 2 * t * t 
             : -1 + (4 - 2 * t) * t;
 
-          camera.position.lerpVectors(startPosition, targetPosition, smoothT);
+          // posición/orientacion
+          camera.position.lerpVectors(camera.position, targetPosition, smoothT);
           camera.lookAt(targetHallOfFame.position);
           renderer.render(scene, camera);
 
-          if (t >= 1) {
-            clearInterval(intervalId);
-            setTimeout(() => setShowOverlay(true), 500);
-          }
-        }, 1000 / frameRate);
-      };
-
-      animateCamera();
-    }
-  };
-
-  useEffect(() => {
-    if (currentHallOfFame) {
-      const initialIndex = hallOfFameIds.indexOf(currentHallOfFame);
-      setHallOfFameIndex(initialIndex);
-
-      const hallOfFameObject = scene.children.find(
-        (child) => child.userData && child.userData.id === currentHallOfFame
-      );
-      if (hallOfFameObject) {
-        hallOfFameObject.getWorldPosition(camera.position);
-        camera.position.y = hallOfFameObject.position.y;
-        camera.lookAt(hallOfFameObject.position);
-        camera.updateProjectionMatrix();
-        renderer.render(scene, camera);
+          if (t < 1) {
+        requestAnimationFrame(animateCamera); // Continúa la animación
+      } else {
+        setTimeout(() => setShowOverlay(true), 380); // Muestra el overlay después de un retardo
       }
+    };
+
+    requestAnimationFrame(animateCamera);
     }
-  }, [currentHallOfFame, scene, camera, renderer]);
+  };  
 
   // Manejar el evento de finalización del juego
   const handleGameEnd = () => {
