@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import './gamePuzzle.css';
 
-const MinigamePuzzle = ({ onGameEnd }) => {
+const MinigamePuzzle = ({ onGameEnd, onGameComplete }) => {
   const [pieces, setPieces] = useState(shufflePieces());
   const [isSolved, setIsSolved] = useState(false);
   const [startTime, setStartTime] = useState(Date.now()); 
@@ -42,6 +42,7 @@ const MinigamePuzzle = ({ onGameEnd }) => {
       clearInterval(timerRef.current);
       const score = `${elapsedTime.minutes} min ${elapsedTime.seconds} s`;
       onGameEnd(score);
+      onGameComplete()
     }
   };
 
@@ -76,6 +77,7 @@ const shufflePieces = () => {
 
 MinigamePuzzle.propTypes = {
   onGameEnd: PropTypes.func.isRequired,
+  onGameComplete: PropTypes.func.isRequired,
 };
 
 export default MinigamePuzzle;

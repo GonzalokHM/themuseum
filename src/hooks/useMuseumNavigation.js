@@ -1,13 +1,16 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import * as THREE from 'three';
 import { useGlobalState } from '../context/useGlobalState';
+import useTrophyInteraction from './useTrophyInteraction';
 
 const useMuseumNavigation = (scene, camera, renderer) => {
   const [currentArtwork, setCurrentArtwork] = useState(null);
+  const [selectedTrophy, setSelectedTrophy] = useState(null);
   const [raycaster] = useState(new THREE.Raycaster());
   const [mouse] = useState(new THREE.Vector2());
   const animationRef = useRef();
   const { state, dispatch } = useGlobalState();
+  const { handleTrophyClick } = useTrophyInteraction(camera, renderer, scene, setSelectedTrophy);
 
   if (!state || !dispatch) {
     throw new Error(
@@ -30,10 +33,19 @@ const useMuseumNavigation = (scene, camera, renderer) => {
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
       raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(scene.children,true);
+      const intersects = raycaster.intersectObjects(scene.children, true);
       if (intersects.length > 0) {
-        const intersectedObject = intersects[0].object;
-        if (intersectedObject.userData.id) {
+        let intersectedObject = intersects[0].object;
+
+        while (intersectedObject.parent && !intersectedObject.userData.type) {
+          intersectedObject = intersectedObject.parent;
+        }
+        // Verificar si es un trofeo o una obra de arte
+        if (intersectedObject.userData.type === 'trophy') {
+          // Manejar clic en el trofeo
+          handleTrophyClick(intersectedObject);
+        } else if (intersectedObject.userData.type === 'artwork') {
+          // Mover la cámara a la obra de arte
           setCurrentArtwork(intersectedObject);
         }
       }
@@ -46,7 +58,7 @@ const useMuseumNavigation = (scene, camera, renderer) => {
       document.removeEventListener('mousemove', onMouseMove, false);
       document.removeEventListener('click', onDocumentClick, false);
     };
-  }, [camera, mouse, raycaster, scene, renderer]);
+  }, [camera, mouse, raycaster, scene, renderer, handleTrophyClick]);
 
   const moveCameraToArtwork = useCallback(
     (artwork) => {
@@ -69,7 +81,10 @@ const useMuseumNavigation = (scene, camera, renderer) => {
           animationRef.current = requestAnimationFrame(animateCamera);
         } else {
           cancelAnimationFrame(animationRef.current);
-            if (!artwork.userData.isHallOfFame && state.currentGame !== artwork.userData.id){
+          if (
+            !artwork.userData.isHallOfFame &&
+            state.currentGame !== artwork.userData.id
+          ) {
             // alert(`Lanzando el juego para ${artwork.userData.name}`);
             dispatch({ type: 'LAUNCH_GAME', payload: artwork.userData.id });
           }
@@ -83,10 +98,10 @@ const useMuseumNavigation = (scene, camera, renderer) => {
   );
 
   const resetCameraPosition = useCallback(() => {
-    setCurrentArtwork(null)
+    setCurrentArtwork(null);
     dispatch({ type: 'END_GAME' });
     const initialPosition = new THREE.Vector3(0, 0, 5);
-    const animateCamera = () => { 
+    const animateCamera = () => {
       camera.position.lerp(initialPosition, 0.1);
       camera.lookAt(new THREE.Vector3(0, 0, 0));
       renderer.render(scene, camera);
@@ -101,6 +116,9 @@ const useMuseumNavigation = (scene, camera, renderer) => {
     animateCamera();
   }, [camera, renderer, scene, dispatch]);
 
+  const resetSelectedTrophy = useCallback(() => {
+    setSelectedTrophy(null);
+  }, []);
 
   useEffect(() => {
     if (currentArtwork) {
@@ -108,7 +126,7 @@ const useMuseumNavigation = (scene, camera, renderer) => {
     }
   }, [currentArtwork, moveCameraToArtwork]);
 
-  return { currentArtwork, resetCameraPosition};
+  return { currentArtwork, resetCameraPosition, selectedTrophy, resetSelectedTrophy };
 };
 
 export default useMuseumNavigation;

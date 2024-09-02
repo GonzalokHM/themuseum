@@ -1,21 +1,39 @@
 import PropTypes from 'prop-types';
-import {saveHighScore} from '../../utils/storageUtils.js'
+import { saveHighScore } from '../../utils/ScoreFunctions.js';
 import MinigamePuzzle from './Puzzle/GamePuzzle';
-
+import GameRacer from './Racer/GameRacer.jsx';
+import { useGlobalState } from './../../context/useGlobalState';
 
 const GameLauncher = ({ artworkId, onGameEnd }) => {
-  const gameId = artworkId; // Supongamos que el artworkId coincide con el gameId
+  const { dispatch } = useGlobalState();
+  const gameId = artworkId; //El artworkId coincide con el gameId
 
   const handleGameEnd = (score) => {
-    const username = 'User'; 
+    const username = 'User';
     saveHighScore(gameId, username, score);
     onGameEnd(); // Notificar al componente padre que el juego ha terminado
   };
 
+  const handleGameComplete = () => {
+    dispatch({ type: 'COMPLETE_GAME', payload: gameId });
+  };
+
   switch (artworkId) {
     case 'puzzle':
-      return <MinigamePuzzle onGameEnd = {handleGameEnd} />;
-    // Agrega más casos para otros juegos aquí
+      return (
+        <MinigamePuzzle
+          onGameEnd={handleGameEnd}
+          onGameComplete={handleGameComplete}
+        />
+      );
+    case 'racer':
+      return (
+        <GameRacer
+          onGameEnd={handleGameEnd}
+          onGameComplete={handleGameComplete}
+        />
+      );
+    // Agregar el resto de juegos!!!
     default:
       return <p>Juego no disponible para esta obra de arte.</p>;
   }

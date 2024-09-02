@@ -25,17 +25,11 @@
     top: 10px;
     right: 10px;
   }
-/*   
-  .backButton {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-  } */
 
 .backHallButton {
     position: absolute;
-    bottom: 3%;
-    right: -50%;
+    bottom: 20%;
+    right: 26%;
     padding: 12px 24px;
     font-size: 14px;
     background-color: #3498db38;
@@ -102,3 +96,16 @@
   cursor: pointer;
   margin-top: 10px;
 }
+
+/* .lockOverlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 200px;
+  background-image: url('img/lock.png');
+  opacity: 0.8;
+  background-size: cover;
+  z-index: 100;
+} */
