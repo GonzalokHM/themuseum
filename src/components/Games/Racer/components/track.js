@@ -14,27 +14,37 @@ export const initTrack = (scene) => {
 
     const curve = new THREE.CatmullRomCurve3([lastPoint, nextPoint]);
 
-  const geometry = new THREE.TubeGeometry(curve, 100, trackWidth / 2, 20, false);
-  geometry.scale(1, -0.1, 1); //aplastar tubeGeometry para que sea plana
-  const material = new THREE.MeshStandardMaterial({ color: 0x404040 });
+    const geometry = new THREE.TubeGeometry(
+      curve,
+      100,
+      trackWidth / 2,
+      20,
+      false
+    );
+    geometry.scale(1, -0.1, 1); //aplastar tubeGeometry para que sea plana
+    const material = new THREE.MeshStandardMaterial({ color: 0x404040 });
 
-  const trackSection = new THREE.Mesh(geometry, material);
+    const trackSection = new THREE.Mesh(geometry, material);
+    geometry.computeBoundingBox();
+    if (!geometry.boundingBox) {
+      console.error("Bounding box is not defined.");
+    } else {
+      console.log("Bounding Box calculated:", geometry.boundingBox);
+    }
 
-  // Calcular la bounding box para usar más adelante
-  geometry.computeBoundingBox();
+    scene.add(trackSection);
+    sections.push({ trackSection, curve });
 
-  scene.add(trackSection);
-  sections.push(trackSection);
+    lastPoint = nextPoint; // Actualizar el último punto
 
-  lastPoint = nextPoint; // Actualizar el último punto
+    return { curve };
+  };
 
-  return { trackSection, curve };
-};
+  // Generar las secciones iniciales de la pista
 
-// Generar las secciones iniciales de la pista
-for (let i = 0; i < 5; i++) {
-  generateSection();
-}
+  for (let i = 0; i < 5; i++) {
+    generateSection();
+  }
 
-return { sections, generateSection, trackWidth };
+  return { sections, generateSection, trackWidth };
 };

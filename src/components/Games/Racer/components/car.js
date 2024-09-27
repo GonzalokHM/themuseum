@@ -13,11 +13,12 @@ export const initCar = (scene, camera) => {
   car.lives = 3;
   car.score = 0;
   car.speed = 0;
-  car.maxSpeed= 330 //limitar velocidad
+  car.maxSpeed= 200
   car.mass = 1000; // masa del coche
   car.wheelBase = 2.5; // distancia entre las ruedas delanteras y traseras
-  car.steeringAngle = 0; // ángulo de dirección
-  car.acceleration = 0; // aceleración del coche
+  car.steeringAngle = 0; 
+  car.acceleration = 0; 
+  car.maxAcceleration = 0.5;
   car.maxSteeringAngle = Math.PI / 6; // máximo ángulo de dirección (30 grados)
 
   scene.add(car);
@@ -40,13 +41,14 @@ export const initCar = (scene, camera) => {
       applyPhysics(car);
       
       // Verificar colisiones
-      const collisionObject = checkCollisions(car, scene.children);
-      if (collisionObject) {
-        car.velocity *= 0.5;
-        car.lives--;
-        scene.remove(collisionObject);
+  const collisionObject = checkCollisions(car, scene.children);
+      if (collisionObject && collisionObject.userData.type === 'obstacle') {
+        car.velocity *= 0.5; // Frenar el coche cuando colisiona con un obstáculo
+        car.lives--; // Reducir vidas en colisión con obstáculos
+        scene.remove(collisionObject); // Remover el obstáculo de la escena
+    
         if (car.lives <= 0) {
-          // Fin juego, el resto se gestiona en GameRacer.jsx
+          console.log('Game Over');
           return;
         }
       }

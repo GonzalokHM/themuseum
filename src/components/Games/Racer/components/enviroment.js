@@ -2,7 +2,6 @@ import * as THREE from 'three';
 
 // elementos entorno
 export const addEnvironmentElements = (scene) => {
-  
   const addTree = (x, z) => {
     const treeGeometry = new THREE.CylinderGeometry(0.5, 0.5, 5);
     const treeMaterial = new THREE.MeshStandardMaterial({ color: 0x228b22 });
@@ -15,22 +14,35 @@ export const addEnvironmentElements = (scene) => {
   addTree(10, 10);
   addTree(-10, 10);
   addTree(10, -10);
-}
+};
 
-  // vallas limitacion pista
- export const addTrackBorders = (scene, trackSection) => {
-  const borderGeometry = new THREE.BoxGeometry(0.2, 1, 50); // Vallas más gruesas y altas
-  const borderMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff });
+// vallas limitacion pista
+export const addTrackBorders = (scene, curve, trackWidth) => {
+  const borders = [];
 
-  const leftBorder = new THREE.Mesh(borderGeometry, borderMaterial);
-  leftBorder.position.set(trackSection.position.x - 5, 0.5, trackSection.position.z);
-  scene.add(leftBorder);
+  // Añadir bordes izquierdo y derecho a lo largo de la curva
+  for (let t = 0; t <= 1; t += 0.1) {
+    const position = curve.getPointAt(t);
+    const leftBorderGeometry = new THREE.BoxGeometry(0.5, 1, 5); // Usamos una caja para que sea sólida
+    const rightBorderGeometry = new THREE.BoxGeometry(0.5, 1, 5);
 
-  const rightBorder = new THREE.Mesh(borderGeometry, borderMaterial);
-  rightBorder.position.set(trackSection.position.x + 5, 0.5, trackSection.position.z);
-  scene.add(rightBorder);
+    const borderMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
 
-  // Asegúrate de que las vallas estén marcadas como colisionables
-  leftBorder.userData.type = 'border';
-  rightBorder.userData.type = 'border';
+    const leftBorder = new THREE.Mesh(leftBorderGeometry, borderMaterial);
+    const rightBorder = new THREE.Mesh(rightBorderGeometry, borderMaterial);
+
+    leftBorder.userData.type = 'border';
+    rightBorder.userData.type = 'border';
+
+    // Posicionar los bordes a los lados de la pista
+    leftBorder.position.set(position.x - trackWidth / 2, position.y + 0.5, position.z);
+    rightBorder.position.set(position.x + trackWidth / 2, position.y + 0.5, position.z);
+
+    scene.add(leftBorder);
+    scene.add(rightBorder);
+
+    borders.push(leftBorder, rightBorder);
+  }
+
+  return borders;
 };

@@ -16,7 +16,7 @@ export const initScene = (mountNode) => {
   mountNode.appendChild(renderer.domElement);
 
   // Inicializar la pista
-  const { sections, curve, trackWidth} = initTrack(scene);
+  const track = initTrack(scene);
 
   // Añadir elementos del entorno
   addEnvironmentElements(scene);
@@ -26,7 +26,7 @@ export const initScene = (mountNode) => {
 
   camera.position.z = 5;
 
-  return { scene, camera, renderer, track: { sections, curve, trackWidth } };
+  return { scene, camera, renderer, track };
 };
 
 export const animateScene = (scene, camera, renderer, car) => {

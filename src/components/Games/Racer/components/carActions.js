@@ -1,25 +1,26 @@
 export const accelerate = (car) => {
-  car.acceleration += 0.02;
-  // car.velocity = Math.min(car.maxSpeed, car.velocity + car.acceleration);
+  car.acceleration = Math.min(car.maxAcceleration, car.acceleration + 0.05);
+  car.velocity = Math.min(car.maxSpeed, car.velocity + car.acceleration);
+  
 };
 
 export const brake = (car) => {
-  car.acceleration = -0.05; 
-  // car.velocity = Math.max(0, car.velocity + car.acceleration);
+  car.acceleration = -0.1; 
+  car.velocity = Math.max(0, car.velocity + car.acceleration);
 };
 
 export const turnLeft = (car) => {
   const turnEffectiveness = Math.max(0.1, 1 - car.velocity / car.maxSpeed); // A menor velocidad, más efectivo el giro
-  car.steeringAngle = Math.min(car.maxSteeringAngle, car.steeringAngle + 0.05 * turnEffectiveness);
+  car.steeringAngle = Math.min(car.maxSteeringAngle, car.steeringAngle + 0.02 * turnEffectiveness);
 };
 
 export const turnRight = (car) => {
   const turnEffectiveness = Math.max(0.1, 1 - car.velocity / car.maxSpeed);
-  car.steeringAngle = Math.max(-car.maxSteeringAngle, car.steeringAngle - 0.05 * turnEffectiveness);};
+  car.steeringAngle = Math.max(-car.maxSteeringAngle, car.steeringAngle - 0.02 * turnEffectiveness);};
 
 export const stopTurning = (car) => {
     // Enderezamiento automático
-    const alignmentSpeed = 0.05; // Ajustar
+    const alignmentSpeed = 0.05;
 
     if (car.steeringAngle > 0) {
       car.steeringAngle = Math.max(0, car.steeringAngle - alignmentSpeed);
@@ -27,3 +28,4 @@ export const stopTurning = (car) => {
       car.steeringAngle = Math.min(0, car.steeringAngle + alignmentSpeed);
     }
   };
+  

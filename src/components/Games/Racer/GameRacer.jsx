@@ -15,39 +15,70 @@ const GameRacer = () => {
 
   useEffect(() => {
     const { scene, camera, renderer, track } = initScene(mountRef.current);
-    // const { sections, curve, trackWidth } = track;
     const car = initCar(scene, camera);
 
     initControls(car);
-        // Inicialmente, generar obstáculos para la primera curva
-        const firstSectionCurve = track.sections[0].curve;
-        initObstacles(scene, firstSectionCurve, track.trackWidth);
 
-    // Inicialmente generar vallas para las secciones existentes
-    // track.sections.forEach((section) => {
-    //   addTrackBorders(scene, section);
-    // });
+    // Asegúrarse de que la curva está correctamente definida antes de pasarla
+    // Verificar si hay secciones y la primera curva está presente
+    if (track.sections.length > 0 && track.sections[0].curve) {
+      const firstSectionCurve = track.sections[0].curve;
+
+      // Inicializar obstáculos en la primera curva
+      initObstacles(scene, firstSectionCurve, track.trackWidth);
+
+      // Añadir vallas para cada sección que tenga curva
+      track.sections.forEach((section) => {
+        if (section.curve) {
+          addTrackBorders(scene, section.curve, track.trackWidth);
+        } else {
+          console.error('Section is missing a curve:', section);
+        }
+      });
+    } else {
+      console.error('First curve is undefined.');
+    }
+
+    let frameCounter = 0; // Agrega un contador de cuadros
 
     const animate = () => {
       if (!isGameOver) {
         requestAnimationFrame(animate);
         animateScene(scene, camera, renderer, car);
-        
+
         if (track.sections && track.sections.length > 0) {
           const lastSection = track.sections[track.sections.length - 1];
-          
-          // Generar nuevas secciones de pista, vallas y obstaculos cuando el coche esté cerca del final de la última sección
-          if (car.position.z < lastSection.geometry.boundingBox.max.z - 100) {
-            const { curve } = track.generateSection();
-            addTrackBorders(scene, curve, track.trackWidth);
-            initObstacles(scene, curve, track.trackWidth);
+
+          if (lastSection.trackSection && lastSection.trackSection.geometry) {
+            // Verificar si boundingBox está definida
+            if (lastSection.trackSection.geometry.boundingBox) {
+              // Si la boundingBox existe, verificar si el coche está cerca del final
+              if (
+                car.position.z <
+                lastSection.trackSection.geometry.boundingBox.max.z - 150
+              ) {
+                const { curve } = track.generateSection();
+                addTrackBorders(scene, curve, track.trackWidth);
+                initObstacles(scene, curve, track.trackWidth);
+              }
+            } else {
+              // Calcular la boundingBox si no está definida
+              lastSection.trackSection.geometry.computeBoundingBox();
+              console.log(
+                'Bounding box computed:',
+                lastSection.trackSection.geometry.boundingBox
+              );
+            }
           }
         }
 
         // Actualizar el HUD con los valores actuales del coche
-        setScore(car.score);
-        setLives(car.lives);
-        setSpeed(car.speed);
+        if (frameCounter % 60 === 0) {
+          setScore(car.score);
+          setLives(car.lives);
+          setSpeed(car.speed);
+        }
+        frameCounter++; // Incrementa el contador
       }
     };
     animate();
@@ -66,7 +97,7 @@ const GameRacer = () => {
 
   return (
     <div>
-      <div ref={mountRef} style={{ width: '70vw', height: '100vh' }} />
+      <div ref={mountRef} style={{ width: '60vw', height: '70vh' }} />
       <HUD score={score} lives={lives} speed={speed} />
       {isGameOver && (
         <div className="game-over-overlay">
