@@ -7,13 +7,20 @@ export const initScene = (mountNode) => {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(
     75,
-    window.innerWidth / window.innerHeight,
+    (window.innerWidth/ 3.6) / (window.innerHeight/ 2.6),
     0.1,
     1000
   );
+
   const renderer = new THREE.WebGLRenderer();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  mountNode.appendChild(renderer.domElement);
+// Ajustar el tamaño del renderer al tamaño del contenedor y prevenir duplicados
+
+// Verifica si no existe un canvas previo
+if (mountNode.childElementCount === 0) {
+  renderer.setSize(window.innerWidth / 3.6, window.innerHeight / 2.6);  // Mitad del tamaño de la ventana
+  renderer.setPixelRatio(window.devicePixelRatio);  // Mejor calidad en pantallas retina
+  mountNode.appendChild(renderer.domElement);  // Agregar solo si no se ha agregado antes
+}
 
   // Inicializar la pista
   const track = initTrack(scene);

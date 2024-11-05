@@ -26,11 +26,11 @@ export const initTrack = (scene) => {
 
     const trackSection = new THREE.Mesh(geometry, material);
     geometry.computeBoundingBox();
-    if (!geometry.boundingBox) {
-      console.error("Bounding box is not defined.");
-    } else {
-      console.log("Bounding Box calculated:", geometry.boundingBox);
-    }
+    // if (!geometry.boundingBox) {
+    //   console.error("Bounding box is not defined.");
+    // } else {
+    //   console.log("Bounding Box calculated:", geometry.boundingBox);
+    // }
 
     scene.add(trackSection);
     sections.push({ trackSection, curve });

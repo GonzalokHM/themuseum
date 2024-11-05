@@ -39,8 +39,6 @@ const GameRacer = () => {
       console.error('First curve is undefined.');
     }
 
-    let frameCounter = 0; // Agrega un contador de cuadros
-
     const animate = () => {
       if (!isGameOver) {
         requestAnimationFrame(animate);
@@ -55,7 +53,7 @@ const GameRacer = () => {
               // Si la boundingBox existe, verificar si el coche está cerca del final
               if (
                 car.position.z <
-                lastSection.trackSection.geometry.boundingBox.max.z - 150
+                lastSection.trackSection.geometry.boundingBox.max.z - 180
               ) {
                 const { curve } = track.generateSection();
                 addTrackBorders(scene, curve, track.trackWidth);
@@ -64,21 +62,14 @@ const GameRacer = () => {
             } else {
               // Calcular la boundingBox si no está definida
               lastSection.trackSection.geometry.computeBoundingBox();
-              console.log(
-                'Bounding box computed:',
-                lastSection.trackSection.geometry.boundingBox
-              );
             }
           }
         }
 
-        // Actualizar el HUD con los valores actuales del coche
-        if (frameCounter % 60 === 0) {
-          setScore(car.score);
-          setLives(car.lives);
-          setSpeed(car.speed);
-        }
-        frameCounter++; // Incrementa el contador
+    // Actualizar el HUD solo si hay cambios en la puntuación, vidas o velocidad
+    setScore(car.score);
+    if (car.lives !== lives) setLives(car.lives);
+    setSpeed(car.velocity);
       }
     };
     animate();
@@ -97,7 +88,7 @@ const GameRacer = () => {
 
   return (
     <div>
-      <div ref={mountRef} style={{ width: '60vw', height: '70vh' }} />
+      <div ref={mountRef} />
       <HUD score={score} lives={lives} speed={speed} />
       {isGameOver && (
         <div className="game-over-overlay">

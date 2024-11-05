@@ -3,16 +3,16 @@ import { accelerate, brake, turnLeft, turnRight, stopTurning } from '../componen
 export const initControls = (car) => {
   document.addEventListener('keydown', (event) => {
     switch (event.key) {
-      case 'ArrowUp':
+      case 'w':
         accelerate(car);
         break;
-      case 'ArrowDown':
+      case 's':
         brake(car);
         break;
-      case 'ArrowLeft':
+      case 'a':
         turnLeft(car);
         break;
-      case 'ArrowRight':
+      case 'd':
         turnRight(car);
         break;
       default:
@@ -21,7 +21,7 @@ export const initControls = (car) => {
   });
 
   document.addEventListener('keyup', (event) => {
-    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+    if (event.key === 'a' || event.key === 'd') {
       stopTurning(car);
     }
   });
