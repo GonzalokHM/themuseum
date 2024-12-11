@@ -18,7 +18,7 @@ export const initCar = (scene, camera) => {
   car.velocity = 0;
   car.lives = 3;
   car.score = 0;
-  car.maxSpeed = 200;
+  car.maxSpeed = 100;
   car.mass = 1200; // masa del coche
   car.wheelBase = 2.5; // distancia entre las ruedas delanteras y traseras
   car.steeringAngle = 0;

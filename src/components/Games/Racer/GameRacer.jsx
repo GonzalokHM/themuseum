@@ -12,6 +12,7 @@ const GameRacer = () => {
   const [lives, setLives] = useState(3);
   const [speed, setSpeed] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
+  const MAX_SECTIONS = 10;
 
   useEffect(() => {
     const { scene, camera, renderer, track } = initScene(mountRef.current);
@@ -19,8 +20,6 @@ const GameRacer = () => {
 
     initControls(car);
 
-    // Asegúrarse de que la curva está correctamente definida antes de pasarla
-    // Verificar si hay secciones y la primera curva está presente
     if (track.sections.length > 0 && track.sections[0].curve) {
       const firstSectionCurve = track.sections[0].curve;
 
@@ -53,23 +52,38 @@ const GameRacer = () => {
               // Si la boundingBox existe, verificar si el coche está cerca del final
               if (
                 car.position.z <
-                lastSection.trackSection.geometry.boundingBox.max.z - 180
+                lastSection.trackSection.geometry.boundingBox.max.z - 50
               ) {
                 const { curve } = track.generateSection();
                 addTrackBorders(scene, curve, track.trackWidth);
                 initObstacles(scene, curve, track.trackWidth);
+
+                if (track.sections.length > MAX_SECTIONS) {
+                  const oldestSection = track.sections.shift();
+                  scene.remove(oldestSection.trackSection);
+                }
+
+                track.sections.push({
+                  trackSection: lastSection.trackSection,
+                  curve,
+                });
               }
             } else {
-              // Calcular la boundingBox si no está definida
+              // Calcular la boundingBox
               lastSection.trackSection.geometry.computeBoundingBox();
             }
           }
         }
 
-    // Actualizar el HUD solo si hay cambios en la puntuación, vidas o velocidad
-    setScore(car.score);
-    if (car.lives !== lives) setLives(car.lives);
-    setSpeed(car.velocity);
+        // Actualizar el HUD solo si hay cambios en la puntuación, vidas o velocidad
+        setScore(car.score);
+        if (car.lives !== lives) setLives(car.lives);
+        setSpeed(car.velocity);
+
+        // Verificación de vidas
+        if (car.lives <= 0 && !isGameOver) {
+          setIsGameOver(true);
+        }
       }
     };
     animate();
@@ -93,7 +107,7 @@ const GameRacer = () => {
       {isGameOver && (
         <div className="game-over-overlay">
           <h1>Game Over</h1>
-          <button onClick={resetGame}>Restart</button>
+          {/* <button onClick={resetGame}>Restart</button> */}
         </div>
       )}
     </div>
