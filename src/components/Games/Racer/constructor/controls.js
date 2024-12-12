@@ -1,19 +1,17 @@
-import { accelerate, brake, turnLeft, turnRight, stopTurning } from '../components/carActions';
-
 export const initControls = (car) => {
   document.addEventListener('keydown', (event) => {
     switch (event.key) {
       case 'w':
-        accelerate(car);
+        car.isAccelerating = true;
         break;
       case 's':
-        brake(car);
+        car.isBraking = true;
         break;
       case 'a':
-        turnLeft(car);
+        car.turnDirection = 1;
         break;
       case 'd':
-        turnRight(car);
+        car.turnDirection = -1;
         break;
       default:
         break;
@@ -21,8 +19,19 @@ export const initControls = (car) => {
   });
 
   document.addEventListener('keyup', (event) => {
-    if (event.key === 'a' || event.key === 'd') {
-      stopTurning(car);
+    switch (event.key) {
+      case 'w':
+        car.isAccelerating = false;
+        break;
+      case 's':
+        car.isBraking = false;
+        break;
+      case 'a':
+      case 'd':
+        car.turnDirection = 0;
+        break;
+      default:
+        break;
     }
   });
 };

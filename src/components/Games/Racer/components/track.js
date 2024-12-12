@@ -26,16 +26,12 @@ export const initTrack = (scene) => {
 
     const trackSection = new THREE.Mesh(geometry, material);
     geometry.computeBoundingBox();
-    // if (!geometry.boundingBox) {
-    //   console.error("Bounding box is not defined.");
-    // } else {
-    //   console.log("Bounding Box calculated:", geometry.boundingBox);
-    // }
+
 
     scene.add(trackSection);
     sections.push({ trackSection, curve });
 
-    lastPoint = nextPoint; // Actualizar el último punto
+    lastPoint = nextPoint;
 
     return { curve };
   };

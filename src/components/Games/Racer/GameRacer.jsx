@@ -39,6 +39,13 @@ const GameRacer = () => {
     }
 
     const animate = () => {
+
+         // Verificación de vidas
+         if (car.lives <= 0 && !isGameOver) {
+          setIsGameOver(true);
+          return;
+        }
+
       if (!isGameOver) {
         requestAnimationFrame(animate);
         animateScene(scene, camera, renderer, car);
@@ -52,7 +59,7 @@ const GameRacer = () => {
               // Si la boundingBox existe, verificar si el coche está cerca del final
               if (
                 car.position.z <
-                lastSection.trackSection.geometry.boundingBox.max.z - 50
+                lastSection.trackSection.geometry.boundingBox.max.z - 40
               ) {
                 const { curve } = track.generateSection();
                 addTrackBorders(scene, curve, track.trackWidth);
@@ -62,11 +69,6 @@ const GameRacer = () => {
                   const oldestSection = track.sections.shift();
                   scene.remove(oldestSection.trackSection);
                 }
-
-                track.sections.push({
-                  trackSection: lastSection.trackSection,
-                  curve,
-                });
               }
             } else {
               // Calcular la boundingBox
@@ -79,11 +81,6 @@ const GameRacer = () => {
         setScore(car.score);
         if (car.lives !== lives) setLives(car.lives);
         setSpeed(car.velocity);
-
-        // Verificación de vidas
-        if (car.lives <= 0 && !isGameOver) {
-          setIsGameOver(true);
-        }
       }
     };
     animate();
@@ -93,13 +90,6 @@ const GameRacer = () => {
     };
   }, [isGameOver]);
 
-  const resetGame = () => {
-    setScore(0);
-    setLives(3);
-    setSpeed(0);
-    setIsGameOver(false);
-  };
-
   return (
     <div>
       <div ref={mountRef} />
@@ -107,7 +97,7 @@ const GameRacer = () => {
       {isGameOver && (
         <div className="game-over-overlay">
           <h1>Game Over</h1>
-          {/* <button onClick={resetGame}>Restart</button> */}
+          <p>Score:{score}m</p>
         </div>
       )}
     </div>
