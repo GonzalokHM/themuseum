@@ -14,6 +14,9 @@ export const initCar = (scene, camera) => {
   const carMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
   const car = new THREE.Mesh(carGeometry, carMaterial);
 
+  car.isAccelerating = false;
+  car.isBraking = false;
+  car.turnDirection = 0;
   car.position.set(0, 0.25, 0);
   car.velocity = 0;
   car.lives = 3;
@@ -31,12 +34,6 @@ export const initCar = (scene, camera) => {
   car.hasCollided = false;
 
   scene.add(car);
-
-  car.accelerate = () => accelerate(car);
-  car.brake = () => brake(car);
-  car.turnLeft = () => turnLeft(car);
-  car.turnRight = () => turnRight(car);
-  car.stopTurning = () => stopTurning(car);
 
   // Actualizar la posición de la cámara en relación con el coche
   car.updateCameraPosition = () => {
