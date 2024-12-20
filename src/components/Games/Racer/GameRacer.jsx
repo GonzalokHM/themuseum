@@ -14,7 +14,7 @@ const GameRacer = () => {
   const [isGameOver, setIsGameOver] = useState(false);
   const MAX_SECTIONS = 10;
 
-  const bordersReferences = useRef([]);
+  let bordersReferences= useRef([]);
 
   useEffect(() => {
     const { scene, camera, renderer, track } = initScene(mountRef.current);
@@ -22,20 +22,24 @@ const GameRacer = () => {
 
     initControls(car);
 
+    let mainCurve = null;
     if (track.sections.length > 0) {
-      const firstSection = track.sections[0];
-      if (firstSection.curve) {
-        initObstacles(scene, firstSection.curve, track.trackWidth);
-        const initialBorders = addTrackBorders(
-          scene,
-          firstSection.curve,
-          track.trackWidth
-        );
-        bordersReferences.current.push({
-          section: firstSection,
-          borders: initialBorders,
-        });
-      }
+      const firstSection = track.sections[track.sections.length - 1];
+      mainCurve = firstSection.curve; 
+
+      car.trackCurve = mainCurve;
+      car.trackWidth = track.trackWidth;
+
+      const startPoint = mainCurve.getPointAt(0);
+      car.position.set(startPoint.x, startPoint.y , startPoint.z);
+      
+      initObstacles(scene, mainCurve, track.trackWidth);
+
+      const initialBorders = addTrackBorders(scene, mainCurve, track.trackWidth);
+      bordersReferences.current.push({
+        section: firstSection,
+        borders: initialBorders
+      });
     } else {
       console.error('No initial sections found');
     }
@@ -61,6 +65,10 @@ const GameRacer = () => {
                 lastSection.trackSection.geometry.boundingBox.max.z - 35
               ) {
                 const { curve } = track.generateSection();
+
+                mainCurve = curve;
+                car.trackCurve = mainCurve;
+
                 initObstacles(scene, curve, track.trackWidth);
 
                 const newBorders = addTrackBorders(

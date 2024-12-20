@@ -10,7 +10,6 @@ export const initCar = (scene, camera) => {
   car.isAccelerating = false;
   car.isBraking = false;
   car.turnDirection = 0;
-  car.position.set(0, 0.25, 0);
   car.velocity = 0;
   car.lives = 3;
   car.score = 0;
@@ -39,7 +38,7 @@ export const initCar = (scene, camera) => {
   car.update = () => {
     applyPhysics(car);
 
-    checkCollisions(car, scene.children);
+    checkCollisions(car, scene.children, car.trackCurve, car.trackWidth);
 
     car.updateCameraPosition();
 

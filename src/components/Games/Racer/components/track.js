@@ -2,14 +2,14 @@ import * as THREE from 'three';
 
 export const initTrack = (scene) => {
   const sections = [];
-  const trackWidth = 10; // Ancho de la pista
-  let lastPoint = new THREE.Vector3(0, 0, 0); // Último punto de control
+  const trackWidth = 10;
+  let lastPoint = new THREE.Vector3(0, 0, 0);
 
   const generateSection = () => {
     const nextPoint = new THREE.Vector3(
-      lastPoint.x + (Math.random() - 0.5) * 20, // Desviación en X
+      lastPoint.x + (Math.random() - 0.5) * 20,
       0,
-      lastPoint.z - 50 // Cada punto más atrás en Z
+      lastPoint.z - 50
     );
 
     const curve = new THREE.CatmullRomCurve3([lastPoint, nextPoint]);
@@ -21,7 +21,6 @@ export const initTrack = (scene) => {
       20,
       false
     );
-    geometry.scale(1, -0.1, 1); //aplastar tubeGeometry para que sea plana
     const material = new THREE.MeshStandardMaterial({ color: 0x404040 });
 
     const trackSection = new THREE.Mesh(geometry, material);
@@ -36,9 +35,8 @@ export const initTrack = (scene) => {
     return { curve };
   };
 
-  // Generar las secciones iniciales de la pista
 
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 1; i++) {
     generateSection();
   }
 
