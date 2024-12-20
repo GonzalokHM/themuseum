@@ -2,43 +2,48 @@ import * as THREE from 'three';
 
 export const checkCollisions = (car, objects) => {
   const carBox = new THREE.Box3().setFromObject(car);
+  let collisionDetected = false;
 
   for (let obj of objects) {
     if (obj.userData.type === 'obstacle' || obj.userData.type === 'border') {
-      // Asegúrate de que se verifica solo contra obstáculos
       const obstacleBox = new THREE.Box3().setFromObject(obj);
       if (carBox.intersectsBox(obstacleBox)) {
+        collisionDetected = true;
         car.hasCollided = true;
 
         if (obj.userData.type === 'obstacle') {
-        // Solo restar una vida si es un nuevo obstáculo o hemos dejado de colisionar con el anterior
-        if (car.lastCollidedObject !== obj) {
-          car.velocity *= 0.5; // Ralentizar el coche
-          car.lives = Math.max(0, car.lives - 1); // Restar una vida (mínimo 0)
-          car.lastCollidedObject = obj; // Guardar el objeto como último obstáculo colisionado
-          console.log("Colisión con obstáculo, vidas restantes: ", car.lives);
+          if (car.lastCollidedObject !== obj) {
+            car.velocity *= 0.5;
+            car.lives = Math.max(0, car.lives - 1);
+            car.lastCollidedObject = obj;
+            console.log('Colisión con obstáculo, vidas restantes: ', car.lives);
 
-          if (car.lives === 0) {
-            console.log("Game Over");
-            return;
+            if (car.lives === 0) {
+              console.log('Game Over');
+              return;
+            }
           }
-        } 
-      }
+        }
 
         if (obj.userData.type === 'border') {
-          // Aplicar rebote
-          car.position.z += 1.0; // Aleja el coche hacia atrás un poco
-          car.velocity *= -0.3; // Reducir velocidad y aplicar una ligera inversión
+          const directionToCenter = -Math.sign(car.position.x);
+          car.position.x += directionToCenter * 0.1;
+          car.velocity *= 0.7;
+          // car.rotation.y += -directionToCenter * 0.05;
           console.log('Colisión con valla, rebote aplicado');
         }
-        return obj; // Devuelve el objeto con el que se colisiona
+        return obj;
       }
     }
   }
-  
-  // Si no hay colisión, restablecer el flag y el último objeto
-  if (!car.hasCollided && car.lastCollidedObject) {
-    car.lastCollidedObject = null; // Restablecer el último objeto con el que colisionamos
+
+  // if (!car.hasCollided && car.lastCollidedObject) {
+  //   car.lastCollidedObject = null;
+  // }
+  if (!collisionDetected) {
+    // Si este frame no hay colisión, restablecer flags
+    if (car.hasCollided) car.hasCollided = false;
+    if (car.lastCollidedObject) car.lastCollidedObject = null;
   }
-  return null; // Si no hay colisión, devuelve null
+  return null;
 };

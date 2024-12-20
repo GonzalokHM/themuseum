@@ -5,7 +5,7 @@ const HUD = ({ score, lives, speed }) => {
     <div style={{ position: 'absolute', top: '10px', left: '10px', color: 'white' }}>
       <div>Score: {Math.floor(score)} meters</div>
       <div>Lives: {lives}</div>
-      <div>Speed: {Math.floor(speed * 100)} km/h</div>
+      <div>Speed: {Math.floor(speed * 30.6)} km/h</div>
     </div>
   );
 };

@@ -14,37 +14,38 @@ const GameRacer = () => {
   const [isGameOver, setIsGameOver] = useState(false);
   const MAX_SECTIONS = 10;
 
+  const bordersReferences = useRef([]);
+
   useEffect(() => {
     const { scene, camera, renderer, track } = initScene(mountRef.current);
     const car = initCar(scene, camera);
 
     initControls(car);
 
-    if (track.sections.length > 0 && track.sections[0].curve) {
-      const firstSectionCurve = track.sections[0].curve;
-
-      // Inicializar obstáculos en la primera curva
-      initObstacles(scene, firstSectionCurve, track.trackWidth);
-
-      // Añadir vallas para cada sección que tenga curva
-      track.sections.forEach((section) => {
-        if (section.curve) {
-          addTrackBorders(scene, section.curve, track.trackWidth);
-        } else {
-          console.error('Section is missing a curve:', section);
-        }
-      });
+    if (track.sections.length > 0) {
+      const firstSection = track.sections[0];
+      if (firstSection.curve) {
+        initObstacles(scene, firstSection.curve, track.trackWidth);
+        const initialBorders = addTrackBorders(
+          scene,
+          firstSection.curve,
+          track.trackWidth
+        );
+        bordersReferences.current.push({
+          section: firstSection,
+          borders: initialBorders,
+        });
+      }
     } else {
-      console.error('First curve is undefined.');
+      console.error('No initial sections found');
     }
 
     const animate = () => {
-
-         // Verificación de vidas
-         if (car.lives <= 0 && !isGameOver) {
-          setIsGameOver(true);
-          return;
-        }
+      // Verificación de vidas
+      if (car.lives <= 0 && !isGameOver) {
+        setIsGameOver(true);
+        return;
+      }
 
       if (!isGameOver) {
         requestAnimationFrame(animate);
@@ -54,20 +55,34 @@ const GameRacer = () => {
           const lastSection = track.sections[track.sections.length - 1];
 
           if (lastSection.trackSection && lastSection.trackSection.geometry) {
-            // Verificar si boundingBox está definida
             if (lastSection.trackSection.geometry.boundingBox) {
-              // Si la boundingBox existe, verificar si el coche está cerca del final
               if (
                 car.position.z <
-                lastSection.trackSection.geometry.boundingBox.max.z - 40
+                lastSection.trackSection.geometry.boundingBox.max.z - 35
               ) {
                 const { curve } = track.generateSection();
-                addTrackBorders(scene, curve, track.trackWidth);
                 initObstacles(scene, curve, track.trackWidth);
+
+                const newBorders = addTrackBorders(
+                  scene,
+                  curve,
+                  track.trackWidth
+                );
+                bordersReferences.current.push({
+                  section: track.sections[track.sections.length - 1],
+                  borders: newBorders,
+                });
 
                 if (track.sections.length > MAX_SECTIONS) {
                   const oldestSection = track.sections.shift();
                   scene.remove(oldestSection.trackSection);
+
+                  const removedBorders = bordersReferences.current.shift();
+                  if (removedBorders && removedBorders.borders) {
+                    removedBorders.borders.forEach((border) => {
+                      scene.remove(border);
+                    });
+                  }
                 }
               }
             } else {
@@ -97,7 +112,7 @@ const GameRacer = () => {
       {isGameOver && (
         <div className="game-over-overlay">
           <h1>Game Over</h1>
-          <p>Score:{score}m</p>
+          <p>Score:{Math.floor(score)}meters</p>
         </div>
       )}
     </div>

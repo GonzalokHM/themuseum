@@ -1,13 +1,6 @@
 import * as THREE from 'three';
 import { applyPhysics } from '../utils/physics';
 import { checkCollisions } from '../utils/collisions';
-import {
-  accelerate,
-  brake,
-  turnLeft,
-  turnRight,
-  stopTurning,
-} from './carActions';
 
 export const initCar = (scene, camera) => {
   const carGeometry = new THREE.BoxGeometry(1, 0.5, 2);
@@ -21,13 +14,13 @@ export const initCar = (scene, camera) => {
   car.velocity = 0;
   car.lives = 3;
   car.score = 0;
-  car.maxSpeed = 100;
-  car.mass = 1200; // masa del coche
-  car.wheelBase = 2.5; // distancia entre las ruedas delanteras y traseras
+  car.maxSpeed = 10;
+  car.mass = 1200;
+  car.wheelBase = 2.5;
   car.steeringAngle = 0;
   car.acceleration = 0;
-  car.maxAcceleration = 0.5;
-  car.maxSteeringAngle = Math.PI / 6; // máximo ángulo de dirección (30 grados)
+  car.maxAcceleration = 0.02;
+  car.maxSteeringAngle = Math.PI / 6; 
 
   // Iniciar flag para colisiones
   car.lastCollidedObject = null;
