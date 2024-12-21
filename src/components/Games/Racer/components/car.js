@@ -2,10 +2,25 @@ import * as THREE from 'three';
 import { applyPhysics } from '../utils/physics';
 import { checkCollisions } from '../utils/collisions';
 
+const textureLoader = new THREE.TextureLoader();
+const bodyTexture = textureLoader.load('img/body.jpg'); // Ruta a la textura del cuerpo
+const cabinTexture = textureLoader.load('img/cabin.jpg');
+
 export const initCar = (scene, camera) => {
-  const carGeometry = new THREE.BoxGeometry(1, 0.5, 2);
-  const carMaterial = new THREE.MeshStandardMaterial({ color: 0x00ff00 });
-  const car = new THREE.Mesh(carGeometry, carMaterial);
+  const carBodyGeometry = new THREE.BoxGeometry(1, 0.5, 2);
+  const carBodyMaterial = new THREE.MeshStandardMaterial({ map: bodyTexture });
+  const carBody = new THREE.Mesh(carBodyGeometry, carBodyMaterial);
+
+  // Cabina del coche
+  const cabinGeometry = new THREE.BoxGeometry(0.6, 0.3, 0.8);
+  const cabinMaterial = new THREE.MeshStandardMaterial({ map: cabinTexture });
+  const cabin = new THREE.Mesh(cabinGeometry, cabinMaterial);
+
+  cabin.position.set(0, 0.4, 0); 
+
+  const car = new THREE.Group();
+  car.add(carBody);
+  car.add(cabin);
 
   car.isAccelerating = false;
   car.isBraking = false;
@@ -27,11 +42,10 @@ export const initCar = (scene, camera) => {
 
   scene.add(car);
 
-  // Actualizar la posición de la cámara en relación con el coche
   car.updateCameraPosition = () => {
     camera.position.x = car.position.x;
-    camera.position.z = car.position.z + 5; // Atraso la cámara para ver el coche desde atrás
-    camera.position.y = car.position.y + 2; // Elevar la cámara un poco
+    camera.position.z = car.position.z + 5; 
+    camera.position.y = car.position.y + 2; 
     camera.lookAt(car.position);
   };
 
@@ -42,7 +56,6 @@ export const initCar = (scene, camera) => {
 
     car.updateCameraPosition();
 
-    // Actualizar la puntuación
     car.score += car.velocity / 10;
   };
 

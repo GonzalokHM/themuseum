@@ -1,5 +1,8 @@
 import * as THREE from 'three';
 
+const textureLoader = new THREE.TextureLoader();
+const texture = textureLoader.load('img/tunelTexture.webp');
+
 export const initTrack = (scene) => {
   const sections = [];
   const trackWidth = 10;
@@ -9,7 +12,7 @@ export const initTrack = (scene) => {
     const nextPoint = new THREE.Vector3(
       lastPoint.x + (Math.random() - 0.5) * 20,
       0,
-      lastPoint.z - 50
+      lastPoint.z - 80
     );
 
     const curve = new THREE.CatmullRomCurve3([lastPoint, nextPoint]);
@@ -21,11 +24,15 @@ export const initTrack = (scene) => {
       20,
       false
     );
-    const material = new THREE.MeshStandardMaterial({ color: 0x404040 });
+
+
+    const material = new THREE.MeshStandardMaterial({
+      map: texture,
+      side: THREE.BackSide,
+    });
 
     const trackSection = new THREE.Mesh(geometry, material);
     geometry.computeBoundingBox();
-
 
     scene.add(trackSection);
     sections.push({ trackSection, curve });
@@ -35,10 +42,9 @@ export const initTrack = (scene) => {
     return { curve };
   };
 
-
-  for (let i = 0; i < 1; i++) {
+ 
     generateSection();
-  }
+  
 
   return { sections, generateSection, trackWidth };
 };

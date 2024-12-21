@@ -24,8 +24,6 @@ export const initObstacles = (scene, curve, trackWidth) => {
     } else {
       console.error('Curve is undefined');
     }
-    const boxHelper = new THREE.BoxHelper(obstacle, 0x00ff00);
-    scene.add(boxHelper);
   };
   // Generar varios obstáculos a lo largo de la curva
   for (let i = 0; i < 5; i++) {

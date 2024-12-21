@@ -3,8 +3,8 @@ import { initScene, animateScene } from './constructor/scene';
 import { initCar } from './components/car';
 import { initControls } from './constructor/controls';
 import { initObstacles } from './constructor/obstacles';
-import { addTrackBorders } from './components/enviroment';
 import HUD from './components/Hud';
+import { addTunnelLights } from './components/lighting';
 
 const GameRacer = () => {
   const mountRef = useRef(null);
@@ -13,8 +13,6 @@ const GameRacer = () => {
   const [speed, setSpeed] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
   const MAX_SECTIONS = 10;
-
-  let bordersReferences= useRef([]);
 
   useEffect(() => {
     const { scene, camera, renderer, track } = initScene(mountRef.current);
@@ -35,11 +33,6 @@ const GameRacer = () => {
       
       initObstacles(scene, mainCurve, track.trackWidth);
 
-      const initialBorders = addTrackBorders(scene, mainCurve, track.trackWidth);
-      bordersReferences.current.push({
-        section: firstSection,
-        borders: initialBorders
-      });
     } else {
       console.error('No initial sections found');
     }
@@ -62,7 +55,7 @@ const GameRacer = () => {
             if (lastSection.trackSection.geometry.boundingBox) {
               if (
                 car.position.z <
-                lastSection.trackSection.geometry.boundingBox.max.z - 35
+                lastSection.trackSection.geometry.boundingBox.max.z - 50
               ) {
                 const { curve } = track.generateSection();
 
@@ -70,27 +63,11 @@ const GameRacer = () => {
                 car.trackCurve = mainCurve;
 
                 initObstacles(scene, curve, track.trackWidth);
-
-                const newBorders = addTrackBorders(
-                  scene,
-                  curve,
-                  track.trackWidth
-                );
-                bordersReferences.current.push({
-                  section: track.sections[track.sections.length - 1],
-                  borders: newBorders,
-                });
+                addTunnelLights(scene, curve, 3);
 
                 if (track.sections.length > MAX_SECTIONS) {
                   const oldestSection = track.sections.shift();
                   scene.remove(oldestSection.trackSection);
-
-                  const removedBorders = bordersReferences.current.shift();
-                  if (removedBorders && removedBorders.borders) {
-                    removedBorders.borders.forEach((border) => {
-                      scene.remove(border);
-                    });
-                  }
                 }
               }
             } else {
