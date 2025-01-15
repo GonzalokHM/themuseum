@@ -38,7 +38,7 @@ const GameRacer = () => {
     }
 
     const animate = () => {
-      // Verificación de vidas
+      
       if (car.lives <= 0 && !isGameOver) {
         setIsGameOver(true);
         return;

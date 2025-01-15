@@ -3,15 +3,14 @@ import * as THREE from 'three';
 export const addLighting = (scene) => {
   const light = new THREE.DirectionalLight(0xffffff, 1);
   light.position.set(5, 10, 7.5);
-  
   scene.add(light);
 
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
   scene.add(ambientLight);
 
-  const lightEnviroment = new THREE.DirectionalLight(0xffffff, 1);
-  lightEnviroment.position.set(-10, 5, -7.5);
-  scene.add(lightEnviroment);
+  const directionalPointLight = new THREE.DirectionalLight(0xffffff, 1);
+  directionalPointLight.position.set(-10, 5, -7.5);
+  scene.add(directionalPointLight);
 };
 
 export const addTunnelLights = (scene, curve, numLights = 5) => {
