@@ -1,76 +1,67 @@
 import * as THREE from 'three';
 import { applyPhysics } from '../utils/physics';
 import { checkCollisions } from '../utils/collisions';
-import { mergeBufferGeometries } from 'three-stdlib';
 
 const textureLoader = new THREE.TextureLoader();
-const carTexture = textureLoader.load('img/nGrid.jpg')
-
-carTexture.wrapS = THREE.ClampToEdgeWrapping;
-carTexture.wrapT = THREE.ClampToEdgeWrapping;
-carTexture.repeat.set(1, 1);
+const cabinTexture = textureLoader.load('img/cabin.jpg');
 
 export const initCar = (scene, camera) => {
-  const carBodyGeometry = new THREE.BoxGeometry(1, 0.5, 2);
-  const bodyUVs = new Float32Array([
-    // Frente
-    0.5, 0.5,  0.75, 0.5,  0.75, 0.75,  0.5, 0.75,
-    // Parte trasera
-    0.75, 0.5,  1.0, 0.5,  1.0, 0.75,  0.75, 0.75,
-    // Superior
-    0.5, 0.75,  0.75, 0.75,  0.75, 1.0,  0.5, 1.0,
-    // Inferior
-    0.0, 0.5,  0.25, 0.5,  0.25, 0.75,  0.0, 0.75,
-    // Izquierda
-    0.25, 0.25,  0.5, 0.25,  0.5, 0.5,  0.25, 0.5,
-    // Derecha
-    0.0, 0.25,  0.25, 0.25,  0.25, 0.5,  0.0, 0.5,
-  ]);
-  carBodyGeometry.setAttribute('uv', new THREE.BufferAttribute(bodyUVs, 2));
+  const car = new THREE.Group();
 
-  const cabinGeometry = new THREE.BufferGeometry(); 
+  const bodyGeometry = new THREE.BoxGeometry(1, 0.5, 2);
+  const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0x525252});
+  const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+  body.castShadow = true;
+  body.receiveShadow = true;
+  car.add(body);
 
-  //vértices y caras para la cabina con inclinaciones para el parabrisas
-  const vertices = new Float32Array([
-    // Base inferior
-    -0.3, 0, -0.4,  0.3, 0, -0.4,  0.3, 0, 0.4,  -0.3, 0, 0.4,
-    // Techo superior
-    -0.2, 0.3, -0.3,  0.2, 0.3, -0.3,  0.2, 0.3, 0.3,  -0.2, 0.3, 0.3,
-  ]);
+  const cabinGeometry = new THREE.BoxGeometry(0.6, 0.4, 1);
+  const cabinMaterial = new THREE.MeshBasicMaterial({
+    map: cabinTexture,
+    side: THREE.DoubleSide,
+  });
+  const cabin = new THREE.Mesh(cabinGeometry, cabinMaterial);
+  cabin.position.set(0, 0.45, 0);
+  cabin.castShadow = true;
+  cabin.receiveShadow = true;
+  car.add(cabin);
 
-  const indices = [
-    // Base inferior
-    0, 1, 2,  2, 3, 0,
-    // Lados
-    0, 1, 5,  5, 4, 0,
-    1, 2, 6,  6, 5, 1,
-    2, 3, 7,  7, 6, 2,
-    3, 0, 4,  4, 7, 3,
-    // Techo superior
-    4, 5, 6,  6, 7, 4,
-  ];
-  const cabinUvs = new Float32Array([
-   // Base inferior
-   0.0, 0.0,  0.25, 0.0,  0.25, 0.25,  0.0, 0.25,
-   // Techo superior
-   0.25, 0.25,  0.5, 0.25,  0.5, 0.5,  0.25, 0.5,
-   // Lados
-   0.5, 0.0,  0.75, 0.0,  0.75, 0.25,  0.5, 0.25,
- ]);
+  const headlightGeometry = new THREE.BoxGeometry(0.4, 0.1, 0.1);
+  const headlightMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+  const headlight1 = new THREE.Mesh(headlightGeometry, headlightMaterial);
+  const headlight2 = headlight1.clone();
+  headlight1.position.set(-0.3, 0.1, -1.01); // Frente izquierdo
+  headlight2.position.set(0.3, 0.1, -1.01); // Frente derecho
+  car.add(headlight1, headlight2);
 
-  cabinGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
-  cabinGeometry.setAttribute('uv', new THREE.BufferAttribute(cabinUvs, 2));
-  cabinGeometry.setIndex(indices);
-  // cabinGeometry.computeVertexNormals(); // Para sombreado
+  const taillightMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+  const taillight1 = new THREE.Mesh(headlightGeometry, taillightMaterial);
+  const taillight2 = taillight1.clone();
+  taillight1.position.set(-0.3, 0.1, 1.01); // Trasero izquierdo
+  taillight2.position.set(0.3, 0.1, 1.01); // Trasero derecho
+  car.add(taillight1, taillight2);
 
-  cabinGeometry.translate(0, 0.4, 0);
+  const neonGeometry = new THREE.PlaneGeometry(1.2, 2.2);
+  const neonMaterial = new THREE.MeshBasicMaterial({
+    color: 0x00ffff,
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.5,
+  });
+  const neon = new THREE.Mesh(neonGeometry, neonMaterial);
+  neon.rotation.x = Math.PI / 2;
+  neon.position.y = -0.25;
+  car.add(neon);
 
-  const combinedGeometry = mergeBufferGeometries([carBodyGeometry, cabinGeometry]);
+  const sidePanelGeometry = new THREE.BoxGeometry(0.05, 0.1, 1.5);
+  const sidePanelMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.7 });
+  const sidePanel1 = new THREE.Mesh(sidePanelGeometry, sidePanelMaterial);
+  const sidePanel2 = sidePanel1.clone();
+  sidePanel1.position.set(-0.55, 0.1, 0); // Panel izquierdo
+  sidePanel2.position.set(0.55, 0.1, 0); // Panel derecho
+  car.add(sidePanel1, sidePanel2);
 
-  const carMaterial = new THREE.MeshBasicMaterial({ map: carTexture });
-
-  // Crear la malla del coche
-  const car = new THREE.Mesh(combinedGeometry, carMaterial);
+  car.position.y = 0.25;
 
   car.isAccelerating = false;
   car.isBraking = false;
