@@ -4,7 +4,9 @@ import { checkBorderCollisionParametric } from './parametricalCollisions';
 export const checkCollisions = (car, objects, trackCurve, trackWidth) => {
   
   const borderCollision = checkBorderCollisionParametric(car, trackCurve, trackWidth);
-  
+  if (borderCollision){
+    // mostrar cartel de vuelve a la pista y provocar turvulencias
+  }
   car.hasCollided = false;
   const carBox = new THREE.Box3().setFromObject(car);
 

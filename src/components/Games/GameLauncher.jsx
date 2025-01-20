@@ -1,22 +1,34 @@
 import PropTypes from 'prop-types';
-import { saveHighScore } from '../../utils/ScoreFunctions.js';
+import { getHighScores, getUserScore, saveHighScore } from '../../utils/ScoreFunctions.js';
 import MinigamePuzzle from './Puzzle/GamePuzzle';
 import GameRacer from './Racer/GameRacer.jsx';
 import { useGlobalState } from './../../context/useGlobalState';
+import HallOfFame from '../HallOfFame/HallOfFame.jsx';
+import { useState } from 'react';
 
 const GameLauncher = ({ artworkId, onGameEnd }) => {
-  const { dispatch } = useGlobalState();
-  const gameId = artworkId; //El artworkId coincide con el gameId
+  const { dispatch,state } = useGlobalState();
+  const gameId = artworkId;
+  const username = state.user || localStorage.getItem('username')
+  const [rankings, setRankings] = useState([]);
+  const [userScore, setUserScore] = useState({ name: username, score: 0 });
+  const [gameFinished, setGameFinished] = useState(false);
 
   const handleGameEnd = (score) => {
-    const username = 'User';
-    saveHighScore(gameId, username, score);
-    onGameEnd(); // Notificar al componente padre que el juego ha terminado
+    saveHighScore(gameId, username, Math.floor(score));
+    setRankings(getHighScores(gameId));
+    setUserScore(getUserScore(gameId, username));
+    setGameFinished(true);
+    onGameEnd();
   };
 
   const handleGameComplete = () => {
     dispatch({ type: 'COMPLETE_GAME', payload: gameId });
   };
+
+  if (gameFinished) {
+    return <HallOfFame gameId={gameId} rankings={rankings} userScore={userScore} />;
+  }
 
   switch (artworkId) {
     case 'puzzle':

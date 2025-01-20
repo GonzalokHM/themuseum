@@ -37,9 +37,9 @@ const MinigamePuzzle = ({ onGameEnd, onGameComplete }) => {
 
   const checkSolution = () => {
     const solved = pieces.slice(0, -1).every((piece, index) => piece === index + 1);
-    setIsSolved(solved);
     if (solved) {
       clearInterval(timerRef.current);
+      setIsSolved(true);
       const score = `${elapsedTime.minutes} min ${elapsedTime.seconds} s`;
       onGameEnd(score);
       onGameComplete()

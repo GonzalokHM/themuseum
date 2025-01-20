@@ -13,15 +13,17 @@ const Museum = () => {
   const [camera, setCamera] = useState(null);
   const [renderer, setRenderer] = useState(null);
   const [selectedArtworkPosition, setSelectedArtworkPosition] = useState(null);
+  const [isGameActive, setIsGameActive] = useState(false);
   const { state, dispatch } = useGlobalState();
   const [currentHallOfFame, setCurrentHallOfFame] = useState(null);
   const [hallOfFameIndex, setHallOfFameIndex] = useState(0);
   const [showOverlay, setShowOverlay] = useState(true);
-  const { currentArtwork, selectedTrophy, resetCameraPosition, resetSelectedTrophy } = useMuseumNavigation(
-    scene,
-    camera,
-    renderer
-  );
+  const {
+    currentArtwork,
+    selectedTrophy,
+    resetCameraPosition,
+    resetSelectedTrophy,
+  } = useMuseumNavigation(scene, camera, renderer);
 
   const username = state.user;
   const hallOfFameIds = ['hallPuzzle', 'hallRacer', 'hall3'];
@@ -97,7 +99,7 @@ const Museum = () => {
       const artwork = new THREE.Mesh(geometry, material);
       artwork.position.set(x, y, z);
       artwork.rotation.y = isHallOfFame ? -Math.PI / 2 : Math.PI / 2;
-      artwork.userData = { id, name, isHallOfFame, type: "artwork"  };
+      artwork.userData = { id, name, isHallOfFame, type: 'artwork' };
 
       // Crear marco 3D para el cuadro
       const frameThickness = 0.1;
@@ -134,8 +136,6 @@ const Museum = () => {
     createArtwork(4.9, 0, -2, 'hallRacer', 'Hall of Fame Racer', true);
     createArtwork(4.9, -1.5, -2, 'hall3', 'Hall of Fame game-3', true);
 
-
-
     // Configuración de la cámara
     camera.position.set(0, 0, 5);
 
@@ -168,38 +168,36 @@ const Museum = () => {
     };
   }, []);
 
-
-    const trophiesData = [
-      {
-        id: 'trophy1Puzzle',
-        position: [-3, 0, -3],
-        gameCompleted: state.completedGames.puzzle,
-        gameName: 'Puzzle',
-        cupMaterialType: 'bronze'
-      },
-      {
-        id: 'trophy2Racer',
-        position: [-1, 0, -3],
-        gameCompleted: state.completedGames.Racer,
-        gameName: 'Racer',
-        cupMaterialType: 'silver'
-      },
-      {
-        id: 'trophy3',
-        position: [1, 0, -3],
-        gameCompleted: state.completedGames.game3,
-        gameName: 'Game3',
-        cupMaterialType: 'gold'
-      },
-      {
-        id: 'trophy4All',
-        position: [3, 0, -3],
-        gameCompleted: state.completedGames.allGames, 
-        gameName: 'AllGames',
-        cupMaterialType: 'diamond'
-
-      },
-    ];
+  const trophiesData = [
+    {
+      id: 'trophy1Puzzle',
+      position: [-3, 0, -3],
+      gameCompleted: state.completedGames.puzzle,
+      gameName: 'Puzzle',
+      cupMaterialType: 'bronze',
+    },
+    {
+      id: 'trophy2Racer',
+      position: [-1, 0, -3],
+      gameCompleted: state.completedGames.Racer,
+      gameName: 'Racer',
+      cupMaterialType: 'silver',
+    },
+    {
+      id: 'trophy3',
+      position: [1, 0, -3],
+      gameCompleted: state.completedGames.game3,
+      gameName: 'Game3',
+      cupMaterialType: 'gold',
+    },
+    {
+      id: 'trophy4All',
+      position: [3, 0, -3],
+      gameCompleted: state.completedGames.allGames,
+      gameName: 'AllGames',
+      cupMaterialType: 'diamond',
+    },
+  ];
 
   useEffect(() => {
     if (currentArtwork) {
@@ -222,9 +220,10 @@ const Museum = () => {
 
       if (currentArtwork.userData.isHallOfFame) {
         setCurrentHallOfFame(currentArtwork.userData.id);
-        dispatch({ type: 'END_GAME' }); // Asegurarse de que cualquier juego en ejecución termine
+        dispatch({ type: 'END_GAME' });
       } else {
         dispatch({ type: 'LAUNCH_GAME', payload: currentArtwork.userData.id });
+        setIsGameActive(true);
       }
     } else {
       setSelectedArtworkPosition(null);
@@ -252,10 +251,8 @@ const Museum = () => {
     resetCameraPosition();
   };
 
-
-
   const handleNextHallOfFame = () => {
-    setShowOverlay(false); // Ocultar el overlay antes de mover la cámara
+    setShowOverlay(false);
 
     const nextIndex = (hallOfFameIndex + 1) % hallOfFameIds.length;
     setHallOfFameIndex(nextIndex);
@@ -301,13 +298,13 @@ const Museum = () => {
     }
   };
 
-  // Manejar el evento de finalización del juego
   const handleGameEnd = () => {
+    setIsGameActive(false);
     dispatch({ type: 'END_GAME' });
   };
 
   const renderBackButton = () => {
-    // Si no estamos en el hall inicial (es decir, hay un artwork o trofeo seleccionado)
+  
     if (currentArtwork || currentHallOfFame || selectedTrophy) {
       return (
         <button
@@ -318,8 +315,9 @@ const Museum = () => {
         </button>
       );
     }
-    return null; // No renderiza nada si estamos en el hall inicial
+    return null;
   };
+
 
   return (
     <div ref={mountRef} className={styles.museum}>
@@ -334,39 +332,37 @@ const Museum = () => {
           <h2>Detalles de la Obra de Arte</h2>
           <p>Nombre: {currentArtwork?.userData.name}</p>
 
-          {state.currentGame && (
+          {isGameActive && state.currentGame && (
             <div className={styles.gameOverlay}>
               <GameLauncher
                 artworkId={state.currentGame}
                 onGameEnd={handleGameEnd}
               />
-              <button onClick={() => dispatch({ type: 'END_GAME' })}>
-                Reiniciar
-              </button>
+              <button onClick={handleGameEnd}>Reiniciar</button>
             </div>
           )}
         </div>
       )}
       {currentHallOfFame && showOverlay && (
-     <HallOfFameOverlay
-     currentHallOfFame={currentHallOfFame}
-     username={username}
-     handleNextHallOfFame={handleNextHallOfFame}
-     />
-    )}
-    {scene &&
-    trophiesData.map((trophy) => (
-        <Trophy
-          key={trophy.id}
-          id={trophy.id}
-          position={trophy.position}
-          gameCompleted={trophy.gameCompleted}
-          gameName={trophy.gameName}
-          scene={scene}
-          cupMaterialType={trophy.cupMaterialType}
+        <HallOfFameOverlay
+          currentHallOfFame={currentHallOfFame}
+          username={username}
+          handleNextHallOfFame={handleNextHallOfFame}
         />
-      ))}
-     {renderBackButton()}
+      )}
+      {scene &&
+        trophiesData.map((trophy) => (
+          <Trophy
+            key={trophy.id}
+            id={trophy.id}
+            position={trophy.position}
+            gameCompleted={trophy.gameCompleted}
+            gameName={trophy.gameName}
+            scene={scene}
+            cupMaterialType={trophy.cupMaterialType}
+          />
+        ))}
+      {renderBackButton()}
     </div>
   );
 };

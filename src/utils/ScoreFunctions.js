@@ -1,16 +1,15 @@
 const scoresDefault = [
   { game: 'hallPuzzle', player: 'Alex', score: '2:28' },
-  { game: 'hall2', player: 'Emma', score: 950 },
+  { game: 'hallRacer', player: 'Emma', score: 950 },
   { game: 'hall3', player: 'Sophia', score: 900 },
-  { game: 'hall2', player: 'Liam', score: 750 },
+  { game: 'hallRacer', player: 'Liam', score: 750 },
   { game: 'hallPuzzle', player: 'Olivia', score: '2:35' },
-  { game: 'hall2', player: 'Noah', score: 920 },
+  { game: 'hallRacer', player: 'Noah', score: 920 },
   { game: 'hall3', player: 'Ava', score: 880 },
   { game: 'hallPuzzle', player: 'Mason', score: '2:20' },
   { game: 'hall3', player: 'Isabella', score: 830 },
 ];
 
-// Convertir todas las puntuaciones a un formato numérico consistente para ordenar correctamente
 const parseScore = (score) => {
   if (typeof score === 'string' && score.includes(':')) {
     const [minutes, seconds] = score.split(':').map(Number);
@@ -58,3 +57,13 @@ export const getUserScore = (gameId, username) => {
   const highScores = getHighScores(gameId);
   return highScores.find((s) => s.username === username);
 };
+
+export const saveScore = (playerName, score) => {
+  let scores = JSON.parse(localStorage.getItem('hallOfFame')) || [];
+  scores.push({ player: playerName, score });
+  localStorage.setItem('hallOfFame', JSON.stringify(scores));
+}
+
+export const getScores = () => {
+  return JSON.parse(localStorage.getItem('hallOfFame')) || [];
+}

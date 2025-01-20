@@ -41,3 +41,37 @@ HallOfFame.propTypes = {
 };
 
 export default HallOfFame;
+// import { useEffect, useState } from 'react';
+// import { getHighScores } from '../../utils/ScoreFunctions.js';
+// import PropTypes from 'prop-types';
+
+// const HallOfFame = ({ gameId }) => {
+//     const [scores, setScores] = useState([]);
+
+//     useEffect(() => {
+//         const storedScores = getHighScores(gameId);
+//         setScores(storedScores);
+//     }, [gameId]);
+
+//     return (
+//         <div>
+//             <h2>Hall of Fame</h2>
+//             <ul>
+//                 {scores.length > 0 ? (
+//                     scores.map((entry, index) => (
+//                         <li key={index}>
+//                             {entry.username}: {entry.score} puntos
+//                         </li>
+//                     ))
+//                 ) : (
+//                     <li>No scores available</li>
+//                 )}
+//             </ul>
+//         </div>
+//     );
+// };
+
+// HallOfFame.propTypes = {
+//     gameId: PropTypes.string.isRequired,}
+
+// export default HallOfFame;

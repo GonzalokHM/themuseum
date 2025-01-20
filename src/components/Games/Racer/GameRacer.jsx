@@ -5,17 +5,28 @@ import { initControls } from './constructor/controls';
 import { initObstacles } from './constructor/obstacles';
 import HUD from './components/Hud';
 import { addTunnelLights } from './components/lighting';
+import PropTypes from 'prop-types';
 
-const GameRacer = () => {
+const GameRacer = ({ onGameEnd }) => {
   const mountRef = useRef(null);
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
   const [speed, setSpeed] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
   const MAX_SECTIONS = 10;
+  const requestRef = useRef(null);
+  const rendererRef = useRef(null);
+
+  const handleGameOver = () => {
+    setIsGameOver(true);
+    setTimeout(() => {
+      onGameEnd(Math.floor(score));  // Dar tiempo para mostrar el mensaje
+    }, 2000);  // Esperar 2 segundos antes de cerrar
+  };
 
   useEffect(() => {
     const { scene, camera, renderer, track } = initScene(mountRef.current);
+    rendererRef.current = renderer;
     const car = initCar(scene, camera);
 
     initControls(car);
@@ -23,29 +34,26 @@ const GameRacer = () => {
     let mainCurve = null;
     if (track.sections.length > 0) {
       const firstSection = track.sections[track.sections.length - 1];
-      mainCurve = firstSection.curve; 
+      mainCurve = firstSection.curve;
 
       car.trackCurve = mainCurve;
       car.trackWidth = track.trackWidth;
 
       const startPoint = mainCurve.getPointAt(0);
-      car.position.set(startPoint.x, startPoint.y , startPoint.z);
-      
-      initObstacles(scene, mainCurve, track.trackWidth);
+      car.position.set(startPoint.x, startPoint.y, startPoint.z);
 
+      initObstacles(scene, mainCurve, track.trackWidth);
     } else {
       console.error('No initial sections found');
     }
 
     const animate = () => {
-      
-      if (car.lives <= 0 && !isGameOver) {
-        setIsGameOver(true);
+      if (isGameOver) {
+        cancelAnimationFrame(requestRef.current);
         return;
       }
 
-      if (!isGameOver) {
-        requestAnimationFrame(animate);
+        requestRef.current = requestAnimationFrame(animate);
         animateScene(scene, camera, renderer, car);
 
         if (track.sections && track.sections.length > 0) {
@@ -71,7 +79,6 @@ const GameRacer = () => {
                 }
               }
             } else {
-              // Calcular la boundingBox
               lastSection.trackSection.geometry.computeBoundingBox();
             }
           }
@@ -81,14 +88,19 @@ const GameRacer = () => {
         setScore(car.score);
         if (car.lives !== lives) setLives(car.lives);
         setSpeed(car.velocity);
-      }
+
+        if (car.lives <= 0 && !isGameOver) {
+          handleGameOver()
+        }
     };
-    animate();
+    requestRef.current = requestAnimationFrame(animate);
 
     return () => {
+      cancelAnimationFrame(requestRef.current);
       renderer.dispose();
+      renderer.domElement.remove();
     };
-  }, [isGameOver]);
+  }, []);
 
   return (
     <div>
@@ -96,12 +108,16 @@ const GameRacer = () => {
       <HUD score={score} lives={lives} speed={speed} />
       {isGameOver && (
         <div className="game-over-overlay">
-          <h1>Game Over</h1>
+          <h1>Game Over !</h1>
           <p>Score:{Math.floor(score)}meters</p>
         </div>
       )}
     </div>
   );
+};
+
+GameRacer.propTypes = {
+  onGameEnd: PropTypes.func.isRequired,
 };
 
 export default GameRacer;

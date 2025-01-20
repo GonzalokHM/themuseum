@@ -5,9 +5,10 @@ const initialState = {
   user: localStorage.getItem('username') || null,
   progress: {},
   currentGame: null,
+  isGameRunning: false,
   completedGames: {
     puzzle: false,
-    game2: false,
+    racer: false,
     game3: false,
     allGames: false,
   },
@@ -23,13 +24,19 @@ const reducer = (state, action) => {
     case 'LAUNCH_GAME':
       return { ...state, currentGame: action.payload };
     case 'END_GAME':
-      return { ...state, currentGame: null };
-    case 'COMPLETE_GAME':
-      {const updatedCompletedGames = {
+      return {
+        ...state,
+        isGameRunning: false,
+        currentGame: null,
+      };
+    case 'COMPLETE_GAME': {
+      const updatedCompletedGames = {
         ...state.completedGames,
         [action.payload]: true,
       };
-      updatedCompletedGames.allGames = Object.values(updatedCompletedGames).every(Boolean);
+      updatedCompletedGames.allGames = Object.values(
+        updatedCompletedGames
+      ).every(Boolean);
       return {
         ...state,
         completedGames: updatedCompletedGames,

@@ -19,7 +19,7 @@ function getClosestPointOnCurve(curve, position, samples = 100) {
 }
 
 export function checkBorderCollisionParametric(car, trackCurve, trackWidth) {
-  if (!trackCurve) return false; // Si no tienes una curva disponible, no detectas nada
+  if (!trackCurve) return false; 
 
   const t = getClosestPointOnCurve(trackCurve, car.position);
   const closestPoint = trackCurve.getPointAt(t);
