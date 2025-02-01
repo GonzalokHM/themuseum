@@ -1,33 +1,63 @@
-import PropTypes from 'prop-types';
-import { getHighScores, getUserScore, saveHighScore } from '../../utils/ScoreFunctions.js';
-import MinigamePuzzle from './Puzzle/GamePuzzle';
-import GameRacer from './Racer/GameRacer.jsx';
-import { useGlobalState } from './../../context/useGlobalState';
-import HallOfFame from '../HallOfFame/HallOfFame.jsx';
-import { useState } from 'react';
+import PropTypes from 'prop-types'
+import MinigamePuzzle from './Puzzle/GamePuzzle'
+import GameRacer from './Racer/GameRacer.jsx'
+import { useGlobalState } from './../../context/useGlobalState'
+import HallOfFame from '../HallOfFame/HallOfFame.jsx'
+import { useState } from 'react'
+import { getGameScores, updateUserScore } from '../../api/api.js'
 
 const GameLauncher = ({ artworkId, onGameEnd }) => {
-  const { dispatch,state } = useGlobalState();
-  const gameId = artworkId;
-  const username = state.user || localStorage.getItem('username')
-  const [rankings, setRankings] = useState([]);
-  const [userScore, setUserScore] = useState({ name: username, score: 0 });
-  const [gameFinished, setGameFinished] = useState(false);
+  const { dispatch } = useGlobalState()
+  const [rankings, setRankings] = useState([])
+  const [userScore, setUserScore] = useState(null)
+  const [loading, setLoading] = useState(false)
 
-  const handleGameEnd = (score) => {
-    saveHighScore(gameId, username, Math.floor(score));
-    setRankings(getHighScores(gameId));
-    setUserScore(getUserScore(gameId, username));
-    setGameFinished(true);
-    onGameEnd();
-  };
+  const handleGameEnd = async (score) => {
+    setLoading(true)
+
+    const response = await updateUserScore(artworkId, Math.floor(score))
+    if (response) {
+      console.log('Puntuación guardada correctamente:', response)
+    }
+
+    const updatedScores = await getGameScores(artworkId)
+    if (updatedScores) {
+      setRankings(updatedScores.top3)
+      setUserScore(updatedScores.userScore)
+    }
+
+    setLoading(false)
+    onGameEnd()
+  }
 
   const handleGameComplete = () => {
-    dispatch({ type: 'COMPLETE_GAME', payload: gameId });
-  };
+    dispatch({ type: 'COMPLETE_GAME', payload: gameId })
+  }
 
-  if (gameFinished) {
-    return <HallOfFame gameId={gameId} rankings={rankings} userScore={userScore} />;
+  useEffect(() => {
+    // Obtener los rankings al cargar el juego
+    const fetchScores = async () => {
+      const scores = await getGameScores(artworkId)
+      if (scores) {
+        setRankings(scores.top3)
+        setUserScore(scores.userScore)
+      }
+    }
+    fetchScores()
+  }, [artworkId])
+
+  if (loading) {
+    return <p className={styles.loading}>Cargando resultados...</p>
+  }
+
+  if (userScore) {
+    return (
+      <HallOfFame
+        gameId={artworkId}
+        rankings={rankings}
+        userScore={userScore}
+      />
+    )
   }
 
   switch (artworkId) {
@@ -37,23 +67,26 @@ const GameLauncher = ({ artworkId, onGameEnd }) => {
           onGameEnd={handleGameEnd}
           onGameComplete={handleGameComplete}
         />
-      );
+      )
     case 'racer':
       return (
         <GameRacer
           onGameEnd={handleGameEnd}
           onGameComplete={handleGameComplete}
         />
-      );
-    // Agregar el resto de juegos!!!
+      )
     default:
-      return <p>Juego no disponible para esta obra de arte.</p>;
+      return (
+        <p className={styles.unavailable}>
+          Juego no disponible para esta obra de arte.
+        </p>
+      )
   }
-};
+}
 
 GameLauncher.propTypes = {
   artworkId: PropTypes.string.isRequired,
-  onGameEnd: PropTypes.func.isRequired,
-};
+  onGameEnd: PropTypes.func.isRequired
+}
 
-export default GameLauncher;
+export default GameLauncher

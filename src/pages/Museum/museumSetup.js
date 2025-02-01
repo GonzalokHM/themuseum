@@ -1,4 +1,28 @@
 import * as THREE from 'three'
+import Trophy from '../../components/trophy/Trophy'
+
+const createWalls = (scene) => {
+  const wallGeometry = new THREE.PlaneGeometry(10, 5)
+  const wallMaterial = new THREE.MeshBasicMaterial({
+    color: 0x808080,
+    side: THREE.DoubleSide
+  })
+
+  const backWall = new THREE.Mesh(wallGeometry, wallMaterial)
+  backWall.position.set(0, 0, -5)
+
+  const leftWall = new THREE.Mesh(wallGeometry, wallMaterial)
+  leftWall.position.set(-5, 0, 0)
+  leftWall.rotation.y = Math.PI / 2
+
+  const rightWall = new THREE.Mesh(wallGeometry, wallMaterial)
+  rightWall.position.set(5, 0, 0)
+  rightWall.rotation.y = -Math.PI / 2
+
+  scene.add(backWall)
+  scene.add(leftWall)
+  scene.add(rightWall)
+}
 
 export const setupScene = (mountNode) => {
   const scene = new THREE.Scene()
@@ -13,6 +37,8 @@ export const setupScene = (mountNode) => {
   mountNode.appendChild(renderer.domElement)
 
   camera.position.set(0, 0, 5)
+
+  createWalls(scene)
 
   const animate = () => {
     requestAnimationFrame(animate)
@@ -49,7 +75,7 @@ export const createArtworks = (scene) => {
   const artworks = [
     { x: -4.9, y: 0, z: -3, id: 'puzzle', name: 'Obra de Arte 1' },
     { x: -4.9, y: 0, z: -1, id: 'racer', name: 'Obra de Arte 2' },
-    { x: -4.9, y: 0, z: 1, id: 'game3', name: 'Obra de Arte 3' },
+    { x: -4.9, y: 0, z: 1, id: 'shooter', name: 'Obra de Arte 3' },
     {
       x: 4.9,
       y: 1.5,
@@ -71,7 +97,7 @@ export const createArtworks = (scene) => {
       y: -1.5,
       z: -2,
       id: 'hall3',
-      name: 'Hall of Fame game-3',
+      name: 'Hall of Fame shooter',
       isHallOfFame: true
     }
   ]
@@ -87,45 +113,96 @@ export const createArtworks = (scene) => {
     artwork.rotation.y = isHallOfFame ? -Math.PI / 2 : Math.PI / 2
     artwork.userData = { id, name, isHallOfFame, type: 'artwork' }
     scene.add(artwork)
+
+    const frameThickness = 0.1
+    const frameDepth = 0.05
+
+    const frameMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 })
+
+    const topBottomGeometry = new THREE.BoxGeometry(
+      1 + frameThickness * 2,
+      frameDepth,
+      frameThickness
+    )
+
+    const topFrame = new THREE.Mesh(topBottomGeometry, frameMaterial)
+    topFrame.position.set(x, y + 0.75, z + frameDepth / 2)
+
+    const bottomFrame = new THREE.Mesh(topBottomGeometry, frameMaterial)
+    bottomFrame.position.set(x, y - 0.75, z + frameDepth / 2)
+
+    topFrame.rotation.y = Math.PI / 2
+    bottomFrame.rotation.y = Math.PI / 2
+
+    scene.add(topFrame)
+    scene.add(bottomFrame)
   })
 }
 
-export const createTrophies = (scene, completedGames) => {
-  const trophies = [
-    {
-      id: 'trophy1Puzzle',
-      position: [-3, 0, -3],
-      gameCompleted: completedGames.puzzle,
-      gameName: 'Puzzle',
-      cupMaterialType: 'bronze'
-    },
-    {
-      id: 'trophy2Racer',
-      position: [-1, 0, -3],
-      gameCompleted: completedGames.racer,
-      gameName: 'Racer',
-      cupMaterialType: 'silver'
-    },
-    {
-      id: 'trophy3',
-      position: [1, 0, -3],
-      gameCompleted: completedGames.game3,
-      gameName: 'Game3',
-      cupMaterialType: 'gold'
-    },
-    {
-      id: 'trophy4All',
-      position: [3, 0, -3],
-      gameCompleted: completedGames.allGames,
-      gameName: 'AllGames',
-      cupMaterialType: 'diamond'
-    }
+export const moveCameraToHallOfFame = (
+  scene,
+  camera,
+  renderer,
+  hallOfFameIds,
+  hallOfFameIndex,
+  setHallOfFameIndex,
+  setCurrentHallOfFame,
+  setShowOverlay
+) => {
+  setShowOverlay(false)
+
+  const cameraPositions = [
+    { x: 4, y: 1.5, z: -2 }, // Cuadro superior
+    { x: 4, y: 0, z: -2 }, // Cuadro medio
+    { x: 4, y: -1.5, z: -2 } // Cuadro inferior
   ]
 
-  return trophies.map(
-    ({ id, position, gameCompleted, gameName, cupMaterialType }) =>
-      gameCompleted
-        ? new Trophy({ id, position, gameName, cupMaterialType, scene })
-        : null
-  )
+  // let nextIndex
+  // if (hallOfFameIndex === 0) {
+  //   nextIndex = 1 // Si estamos en el primero, vamos al medio
+  // } else if (hallOfFameIndex === 1) {
+  //   nextIndex = 2 // Si estamos en el medio, ahora sí va al tercero
+  // } else {
+  //   nextIndex = 0 // Si estamos en el último, volvemos al primero
+  // }
+
+  let nextIndex = (hallOfFameIndex + 1) % hallOfFameIds.length
+
+  const targetPosition = cameraPositions[nextIndex]
+
+  if (!targetPosition) return
+
+  // const targetHallOfFame = scene.children.find(
+  //   (child) => child.userData && child.userData.id === hallOfFameIds[nextIndex]
+  // )
+  // if (!targetHallOfFame) return
+
+  const startTime = performance.now()
+  const duration = 1.5
+
+  const animateCamera = (time) => {
+    const elapsed = (time - startTime) / 1000
+    const t = Math.min(elapsed / duration, 1)
+    const smoothT = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
+
+    camera.position.lerpVectors(
+      camera.position,
+      new THREE.Vector3(targetPosition.x, targetPosition.y, targetPosition.z),
+      smoothT
+    )
+
+    renderer.render(scene, camera)
+
+    if (t < 1) {
+      requestAnimationFrame(animateCamera)
+    } else {
+      setTimeout(() => {
+        setHallOfFameIndex(nextIndex)
+        setCurrentHallOfFame(hallOfFameIds[nextIndex])
+        setShowOverlay(true)
+      }, 400)
+    }
+  }
+
+  requestAnimationFrame(animateCamera)
 }

@@ -1,4 +1,4 @@
-import API_URL from '../config'
+const API_URL = 'https://backmuseumapi.onrender.com/api'
 
 const getAuthHeaders = () => {
   const { state } = useGlobalState()

@@ -1,4 +1,3 @@
-import { div } from 'three/tsl'
 import { fetchUserProfile } from '../../api/api'
 
 const UserProfile = () => {
