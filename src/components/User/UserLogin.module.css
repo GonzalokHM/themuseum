@@ -1,40 +1,109 @@
 .login {
-    position: absolute;
-    top: 60%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-  }
-  
-  .login input {
-    width: 80%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #cccccc;
-    border-radius: 4px;
-    text-align: center;
-  }
-  
-  .login button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
-  }
-  
-  .login button:hover {
-    background-color: #0056b3;
-  }
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
 
-  @media (max-width: 420px) {
-    .login{
-      width: 212px;
-    }
+.login input {
+  width: 80%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  text-align: center;
+}
+.passwordContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.passwordToggle {
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+  font-size: 18px;
+  color: #666;
+}
+
+.passwordStrengthContainer {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.passwordStrengthBar {
+  width: 80%;
+  height: 8px;
+  background-color: #ddd;
+  border-radius: 4px;
+  margin: 5px auto;
+  position: relative;
+}
+
+.passwordStrengthIndicator {
+  height: 100%;
+  border-radius: 4px;
+  width: 0%;
+  transition: width 0.3s ease-in-out;
+  background: linear-gradient(to right, red, orange, yellow, green);
+}
+
+.strengthWeak .passwordStrengthIndicator {
+  width: 33%;
+}
+
+.strengthMedium .passwordStrengthIndicator {
+  width: 66%;
+}
+
+.strengthStrong .passwordStrengthIndicator {
+  width: 100%;
+}
+
+.passwordStrengthText {
+  font-size: 14px;
+  font-weight: bold;
+  margin-top: 5px;
+  text-transform: uppercase;
+}
+
+.passwordRequirements {
+  list-style: none;
+  padding: 0;
+  margin: 5px 0 0 0;
+  font-size: 12px;
+  color: #d9534f;
+  text-align: left;
+  max-width: 80%;
+}
+
+.passwordRequirements li {
+  padding: 2px 0;
+}
+.login button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+.login button:hover {
+  background-color: #0056b3;
+}
+
+@media (max-width: 420px) {
+  .login {
+    width: 212px;
   }
-  
+}

@@ -1,29 +1,52 @@
 import { useState } from 'react'
-import PropTypes from 'prop-types'
 import styles from './UserLogin.module.css'
+import { useGlobalState } from '../../context/useGlobalState'
+import {
+  checkPasswordStrength,
+  strongPasswordRegex
+} from '../../utils/passwordLogin'
 
 const UserLogin = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [isRegistering, setIsRegistering] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [passwordStrength, setPasswordStrength] = useState('')
+  const [passwordRequirements, setPasswordRequirements] = useState([])
   const { dispatch } = useGlobalState()
+
+  const handlePasswordChange = (e) => {
+    const newPassword = e.target.value
+    setPassword(newPassword)
+    const { strength, requirements } = checkPasswordStrength(newPassword)
+    setPasswordStrength(strength)
+    setPasswordRequirements(requirements)
+  }
+
+  const getStrengthClass = () => {
+    if (passwordStrength === 'Débil') return styles.strengthWeak
+    if (passwordStrength === 'Media') return styles.strengthMedium
+    if (passwordStrength === 'Fuerte') return styles.strengthStrong
+    return ''
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setErrorMessage('')
 
     if (isRegistering) {
-      // Registro de usuario
-      const result = await registerUser(username, password)
-      if (result) {
-        alert('Usuario registrado correctamente. Ahora inicia sesión.')
-        setIsRegistering(false)
+      if (!strongPasswordRegex.test(password)) {
+        setErrorMessage('La contraseña debe cumplir con los requisitos.')
+        return
+      }
+      const userData = await registerUser(username, password)
+      if (userData) {
+        dispatch({ type: 'SET_USER', payload: userData })
       } else {
         setErrorMessage('Error al registrar el usuario.')
       }
     } else {
-      // Login de usuario
       const userData = await loginUser(username, password)
       if (userData) {
         dispatch({ type: 'SET_USER', payload: userData })
@@ -43,12 +66,43 @@ const UserLogin = () => {
           onChange={(e) => setUsername(e.target.value)}
           placeholder='Nombre de usuario'
         />
-        <input
-          type='password'
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder='Contraseña'
-        />
+        <div className={styles.passwordContainer}>
+          <input
+            type={showPassword ? 'text' : 'password'}
+            value={password}
+            onChange={handlePasswordChange}
+            placeholder='Contraseña'
+          />
+          <img
+            src={showPassword ? '/icons/eyeSlash.png' : '/icons/eye.png'}
+            alt='Toggle Password Visibility'
+            className={styles.passwordToggle}
+            onClick={() => setShowPassword(!showPassword)}
+          />
+        </div>
+        {password && (
+          <div className={styles.passwordStrengthContainer}>
+            <div className={styles.passwordStrengthBar}>
+              <div
+                className={`${
+                  styles.passwordStrengthIndicator
+                } ${getStrengthClass()}`}
+              ></div>
+            </div>
+            <p
+              className={`${styles.passwordStrengthText} ${getStrengthClass()}`}
+            >
+              {passwordStrength}
+            </p>
+            {passwordRequirements.length > 0 && (
+              <ul className={styles.passwordRequirements}>
+                {passwordRequirements.map((req, index) => (
+                  <li key={index}>{req}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
         <button type='submit'>
           {isRegistering ? 'Registrarse' : 'Iniciar Sesión'}
         </button>
@@ -61,10 +115,6 @@ const UserLogin = () => {
       </button>
     </div>
   )
-}
-
-UserLogin.propTypes = {
-  onLogin: PropTypes.func.isRequired
 }
 
 export default UserLogin

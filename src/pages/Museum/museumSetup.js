@@ -152,30 +152,16 @@ export const moveCameraToHallOfFame = (
   setShowOverlay(false)
 
   const cameraPositions = [
-    { x: 4, y: 1.5, z: -2 }, // Cuadro superior
-    { x: 4, y: 0, z: -2 }, // Cuadro medio
-    { x: 4, y: -1.5, z: -2 } // Cuadro inferior
+    { x: 4, y: 1.5, z: -2 },
+    { x: 4, y: 0, z: -2 },
+    { x: 4, y: -1.5, z: -2 }
   ]
-
-  // let nextIndex
-  // if (hallOfFameIndex === 0) {
-  //   nextIndex = 1 // Si estamos en el primero, vamos al medio
-  // } else if (hallOfFameIndex === 1) {
-  //   nextIndex = 2 // Si estamos en el medio, ahora sí va al tercero
-  // } else {
-  //   nextIndex = 0 // Si estamos en el último, volvemos al primero
-  // }
 
   let nextIndex = (hallOfFameIndex + 1) % hallOfFameIds.length
 
   const targetPosition = cameraPositions[nextIndex]
 
   if (!targetPosition) return
-
-  // const targetHallOfFame = scene.children.find(
-  //   (child) => child.userData && child.userData.id === hallOfFameIds[nextIndex]
-  // )
-  // if (!targetHallOfFame) return
 
   const startTime = performance.now()
   const duration = 1.5
