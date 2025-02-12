@@ -6,30 +6,25 @@ import { initObstacles } from './constructor/obstacles'
 import HUD from './components/Hud'
 import { addTunnelLights } from './components/lighting'
 import PropTypes from 'prop-types'
-import { updateUserScore } from '../../../api/api'
 
 const GameRacer = ({ onGameEnd }) => {
   const mountRef = useRef(null)
   const [lives, setLives] = useState(3)
   const [speed, setSpeed] = useState(0)
-  let score = 0
+  const [score, setScore] = useState(0)
   const [isGameOver, setIsGameOver] = useState(false)
   const MAX_SECTIONS = 10
   const requestRef = useRef(null)
   const rendererRef = useRef(null)
 
   const handleGameOver = async () => {
+    if (isGameOver) return
     setIsGameOver(true)
 
     const finalScore = Math.floor(score)
-
-    const response = await updateUserScore('racer', finalScore)
-    if (response) {
-      console.log('Puntuación actualizada:', response)
-    }
     setTimeout(() => {
-      onGameEnd(finalScore) // Dar tiempo para mostrar el mensaje
-    }, 2000)
+      onGameEnd(finalScore, true)
+    }, 1500)
   }
 
   useEffect(() => {
@@ -93,7 +88,7 @@ const GameRacer = ({ onGameEnd }) => {
       }
 
       // Actualizar el HUD solo si hay cambios en la puntuación, vidas o velocidad
-      score = car.score
+      setScore(Math.floor(car.score))
       if (car.lives !== lives) setLives(car.lives)
       setSpeed(car.velocity)
 

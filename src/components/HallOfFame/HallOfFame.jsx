@@ -20,29 +20,29 @@ const HallOfFame = ({ gameId }) => {
 
   return (
     <div>
-      <h2>Hall of Fame ${gameId}</h2>
+      <h2>Hall of Fame {gameId}</h2>
       {rankings.length > 0 ? (
         <div>
           <h3>Top 3 Scores</h3>
-          <ol>
+          <ul>
             {rankings.map((player, index) => (
               <li key={index}>
-                {index + 1}. {player.username}: {player.score}
+                {index + 1}. {player.username}: {player.scores[gameId]}
               </li>
             ))}
-          </ol>
+          </ul>
         </div>
       ) : (
         <p>No hay puntuaciones registradas aún para este juego.</p>
       )}
 
-      {userScore &&
-        !rankings.some((score) => score.name === userScore.name) && (
-          <div>
-            <h3>Tu mejor puntuación</h3>
-            <p>{userScore.score}</p>
-          </div>
-        )}
+      {userScore && (
+        // !rankings.some((score) => score.name === userScore.name) &&
+        <div>
+          <h3>Tu mejor puntuación</h3>
+          <p>{userScore.scores[gameId]}</p>
+        </div>
+      )}
     </div>
   )
 }

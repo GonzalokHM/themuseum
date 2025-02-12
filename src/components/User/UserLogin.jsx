@@ -5,16 +5,20 @@ import {
   checkPasswordStrength,
   strongPasswordRegex
 } from '../../utils/passwordLogin'
+import { loginUser, registerUser } from '../../api/api'
+import { useNavigate } from 'react-router-dom'
 
 const UserLogin = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [isRegistering, setIsRegistering] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [passwordStrength, setPasswordStrength] = useState('')
   const [passwordRequirements, setPasswordRequirements] = useState([])
   const { dispatch } = useGlobalState()
+  const navigate = useNavigate()
 
   const handlePasswordChange = (e) => {
     const newPassword = e.target.value
@@ -23,7 +27,7 @@ const UserLogin = () => {
     setPasswordStrength(strength)
     setPasswordRequirements(requirements)
   }
-
+  // ❗❌✅
   const getStrengthClass = () => {
     if (passwordStrength === 'Débil') return styles.strengthWeak
     if (passwordStrength === 'Media') return styles.strengthMedium
@@ -33,33 +37,52 @@ const UserLogin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    setErrorMessage('')
+    if (loading) return
 
-    if (isRegistering) {
-      if (!strongPasswordRegex.test(password)) {
-        setErrorMessage('La contraseña debe cumplir con los requisitos.')
-        return
-      }
-      const userData = await registerUser(username, password)
-      if (userData) {
-        dispatch({ type: 'SET_USER', payload: userData })
+    setLoading(true)
+    setErrorMessage('')
+    try {
+      if (isRegistering) {
+        if (!strongPasswordRegex.test(password)) {
+          setErrorMessage('La contraseña debe cumplir con los requisitos.')
+          setLoading(false)
+          return
+        }
+        const registerData = await registerUser(username, password)
+        if (registerData) {
+          const userData = await loginUser(username, password)
+          if (userData) {
+            dispatch({ type: 'SET_USER', payload: userData })
+            console.log('✅ Usuario autenticado en UserLogin:', userData)
+            navigate('/')
+          } else {
+            setErrorMessage('Error al registrar el usuario.')
+          }
+        } else {
+          setErrorMessage('Error al iniciar sesión tras el registro.')
+        }
       } else {
-        setErrorMessage('Error al registrar el usuario.')
+        const userData = await loginUser(username, password)
+        if (userData) {
+          dispatch({ type: 'SET_USER', payload: userData })
+          console.log('✅ Usuario autenticado en UserLogin:', userData)
+          navigate('/')
+        } else {
+          setErrorMessage('Error al iniciar sesión. Verifica tus credenciales.')
+        }
       }
-    } else {
-      const userData = await loginUser(username, password)
-      if (userData) {
-        dispatch({ type: 'SET_USER', payload: userData })
-      } else {
-        setErrorMessage('Error al iniciar sesión. Verifica tus credenciales.')
-      }
+    } catch (error) {
+      console.error('❌ Error en la solicitud:', error)
+      setErrorMessage('Error inesperado, intenta de nuevo.')
     }
+
+    setLoading(false)
   }
 
   return (
     <div className={styles.login}>
       <h2>{isRegistering ? 'Regístrate' : 'Iniciar Sesión'}</h2>
-      <form onSubmit={handleSubmit}>
+      <form id='loginRegistform' onSubmit={handleSubmit}>
         <input
           type='text'
           value={username}
@@ -80,20 +103,14 @@ const UserLogin = () => {
             onClick={() => setShowPassword(!showPassword)}
           />
         </div>
-        {password && (
+        {isRegistering && password && (
           <div className={styles.passwordStrengthContainer}>
-            <div className={styles.passwordStrengthBar}>
-              <div
-                className={`${
-                  styles.passwordStrengthIndicator
-                } ${getStrengthClass()}`}
-              ></div>
-            </div>
-            <p
-              className={`${styles.passwordStrengthText} ${getStrengthClass()}`}
+            <div
+              className={`${styles.passwordStrengthBar} ${getStrengthClass()}`}
             >
-              {passwordStrength}
-            </p>
+              <div className={styles.passwordStrengthIndicator}></div>
+            </div>
+            <p className={styles.passwordStrengthText}>{passwordStrength}</p>
             {passwordRequirements.length > 0 && (
               <ul className={styles.passwordRequirements}>
                 {passwordRequirements.map((req, index) => (
@@ -103,8 +120,12 @@ const UserLogin = () => {
             )}
           </div>
         )}
-        <button type='submit'>
-          {isRegistering ? 'Registrarse' : 'Iniciar Sesión'}
+        <button type='submit' disabled={loading}>
+          {loading
+            ? 'Cargando...'
+            : isRegistering
+            ? 'Registrarse'
+            : 'Iniciar Sesión'}
         </button>
       </form>
       {errorMessage && <p className={styles.error}>{errorMessage}</p>}

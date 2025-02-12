@@ -96,7 +96,7 @@ export const createArtworks = (scene) => {
       x: 4.9,
       y: -1.5,
       z: -2,
-      id: 'hall3',
+      id: 'hallShooter',
       name: 'Hall of Fame shooter',
       isHallOfFame: true
     }

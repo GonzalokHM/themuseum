@@ -47,6 +47,7 @@
   border-radius: 4px;
   margin: 5px auto;
   position: relative;
+  overflow: hidden;
 }
 
 .passwordStrengthIndicator {
@@ -54,19 +55,21 @@
   border-radius: 4px;
   width: 0%;
   transition: width 0.3s ease-in-out;
-  background: linear-gradient(to right, red, orange, yellow, green);
 }
 
 .strengthWeak .passwordStrengthIndicator {
   width: 33%;
+  background: red;
 }
 
 .strengthMedium .passwordStrengthIndicator {
   width: 66%;
+  background: linear-gradient(to right, red, orange, yellow);
 }
 
 .strengthStrong .passwordStrengthIndicator {
   width: 100%;
+  background: linear-gradient(to right, red, orange, yellow, green);
 }
 
 .passwordStrengthText {

@@ -2,12 +2,11 @@ import { createContext, useReducer, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
 const initialState = {
-  user: localStorage.getItem('username') || null,
+  user: JSON.parse(localStorage.getItem('user')) || null,
   token: localStorage.getItem('token') || null,
-  progress: {},
   currentGame: null,
   isGameRunning: false,
-  completedGames: {
+  completedGames: JSON.parse(localStorage.getItem('completedGames')) || {
     puzzle: false,
     racer: false,
     shooter: false,
@@ -18,21 +17,25 @@ const initialState = {
 const reducer = (state, action) => {
   switch (action.type) {
     case 'SET_USER':
-      localStorage.setItem('username', action.payload.username)
-      localStorage.setItem('token', action.payload.token)
+      console.log('✅ Guardando usuario en localStorage:', action.payload)
+      const user = action.payload.user
+      const token = action.payload.token
+
+      localStorage.setItem('user', JSON.stringify(user))
+      if (token) {
+        localStorage.setItem('token', token)
+      }
       return {
         ...state,
-        user: action.payload.username,
-        token: action.payload.token
+        user: user,
+        token: token
       }
 
     case 'LOGOUT':
-      localStorage.removeItem('username')
+      localStorage.removeItem('user')
       localStorage.removeItem('token')
       return { ...state, user: null, token: null }
 
-    case 'UPDATE_PROGRESS':
-      return { ...state, progress: { ...state.progress, ...action.payload } }
     case 'LAUNCH_GAME':
       return { ...state, currentGame: action.payload }
     case 'END_GAME':
@@ -49,6 +52,12 @@ const reducer = (state, action) => {
       updatedCompletedGames.allGames = Object.values(
         updatedCompletedGames
       ).every(Boolean)
+
+      localStorage.setItem(
+        'completedGames',
+        JSON.stringify(updatedCompletedGames)
+      )
+
       return {
         ...state,
         completedGames: updatedCompletedGames
@@ -65,11 +74,16 @@ export const GlobalStateProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState)
 
   useEffect(() => {
-    if (state.user) {
-      localStorage.setItem('username', state.user)
-      localStorage.setItem('token', state.token)
+    const storedUser = localStorage.getItem('user')
+    const storedToken = localStorage.getItem('token')
+
+    if (storedUser && storedToken) {
+      dispatch({
+        type: 'SET_USER',
+        payload: { user: JSON.parse(storedUser), token: storedToken }
+      })
     }
-  }, [state.user])
+  }, [])
 
   return (
     <GlobalStateContext.Provider value={{ state, dispatch }}>

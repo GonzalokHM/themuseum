@@ -1,0 +1,54 @@
+.settings-container {
+  padding: 20px;
+  background: var(--background);
+  color: var(--text-color);
+  border-radius: 8px;
+  width: 300px;
+  margin: auto;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  text-align: center;
+}
+
+div {
+  margin-bottom: 15px;
+}
+
+label {
+  font-weight: bold;
+}
+
+input[type='range'] {
+  width: 100%;
+}
+
+button {
+  width: 100%;
+  padding: 8px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: var(--primary-color);
+  color: white;
+}
+
+button:hover {
+  background-color: var(--primary-dark);
+}
+
+[data-theme='light'] {
+  --background: white;
+  --text-color: black;
+  --primary-color: #007bff;
+  --primary-dark: #0056b3;
+}
+
+[data-theme='dark'] {
+  --background: #222;
+  --text-color: white;
+  --primary-color: #ffcc00;
+  --primary-dark: #d4a500;
+}

@@ -1,68 +1,68 @@
 .museum {
-    width: 100%;
-    height: 100%;
-    position: relative;
-  }
-  
-  .artworkOverlay {
-    position: absolute;
-    padding: 5px;
-    transform: translate(-50%, -50%);
-    top: 50%;
-    left: 50%;
-    height: 75%;
-  }
-  
-  .gameOverlay {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    position: relative;
-  }
-  
-  .closeButton {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-  }
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.artworkOverlay {
+  position: absolute;
+  padding: 5px;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+  height: 75%;
+}
+
+.gameOverlay {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.closeButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
 
 .backHallButton {
-    position: absolute;
-    bottom: 20%;
-    right: 26%;
-    padding: 12px 24px;
-    font-size: 14px;
-    background-color: #3498db38;
-    color: #ffffff;
-    border: none;
-    cursor: pointer;
-    outline: none;
-    border-radius: 12px;
-    transition: background-color 0.3s ease, transform 0.2s ease, filter 0.3s ease;
-  }
-  
-  .backHallButton:hover {
-    background-color: #2980b9;
-    transform: scale(1.05);
-    filter: blur(4px);
-  }
-  
-  .backHallButton:focus {
-    outline: none;
-  }
-  
-  .backHallButton::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: -1;
-    backdrop-filter: blur(8px);
-    border-radius: 4px;
-  }
+  position: absolute;
+  z-index: 101;
+  bottom: 11%;
+  right: 26%;
+  padding: 12px 24px;
+  font-size: 14px;
+  background-color: #3498db38;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  border-radius: 12px;
+  transition: background-color 0.3s ease, transform 0.2s ease, filter 0.3s ease;
+}
 
+.backHallButton:hover {
+  background-color: #2980b9;
+  transform: scale(1.05);
+  filter: blur(4px);
+}
+
+.backHallButton:focus {
+  outline: none;
+}
+
+.backHallButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  backdrop-filter: blur(8px);
+  border-radius: 4px;
+}
 
 .hallOfFameSection {
   position: absolute;
@@ -88,7 +88,7 @@
 }
 
 .nextButton {
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   padding: 10px 20px;
   border: none;

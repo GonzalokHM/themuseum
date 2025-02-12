@@ -13,14 +13,15 @@ import {
 } from './museumSetup'
 import getTrophiesData from '../../components/trophy/trophyData'
 import Trophy from '../../components/trophy/Trophy'
+import ArtworkDetail from './ArtWorkDetail/ArtWorkDetail'
 
 const Museum = () => {
   const mountRef = useRef(null)
   const [scene, setScene] = useState(null)
   const [camera, setCamera] = useState(null)
   const [renderer, setRenderer] = useState(null)
-  const [isGameActive, setIsGameActive] = useState(false)
   const { state, dispatch } = useGlobalState()
+  const [selectedArtwork, setSelectedArtwork] = useState(null)
   const [currentHallOfFame, setCurrentHallOfFame] = useState(null)
   const [hallOfFameIndex, setHallOfFameIndex] = useState(0)
   const [showOverlay, setShowOverlay] = useState(true)
@@ -31,7 +32,7 @@ const Museum = () => {
     resetSelectedTrophy
   } = useMuseumNavigation(scene, camera, renderer)
 
-  const hallOfFameIds = ['hallPuzzle', 'hallRacer', 'hallshooter']
+  const hallOfFameIds = ['hallpuzzle', 'hallracer', 'hallshooter']
 
   useEffect(() => {
     if (!mountRef.current) return
@@ -44,7 +45,9 @@ const Museum = () => {
     setRenderer(renderer)
 
     return () => {
-      mountRef.current.removeChild(renderer.domElement)
+      if (mountRef.current && renderer) {
+        mountRef.current.removeChild(renderer.domElement)
+      }
     }
   }, [])
 
@@ -55,13 +58,13 @@ const Museum = () => {
       setCurrentHallOfFame(currentArtwork.userData.id)
       dispatch({ type: 'END_GAME' })
     } else {
-      dispatch({ type: 'LAUNCH_GAME', payload: currentArtwork.userData.id })
-      setIsGameActive(true)
+      setSelectedArtwork(currentArtwork.userData.id)
     }
   }, [currentArtwork, renderer, camera, dispatch])
 
   const handleResetCamera = () => {
     setCurrentHallOfFame(null)
+    setSelectedArtwork(null)
     resetSelectedTrophy()
     resetCameraPosition()
   }
@@ -90,21 +93,9 @@ const Museum = () => {
     )
   }
 
-  const handleGameEnd = () => {
-    setIsGameActive(false)
-    dispatch({ type: 'END_GAME' })
-  }
   return (
     <div ref={mountRef} className={styles.museum}>
-      {isGameActive && state.currentGame && (
-        <div className={styles.gameOverlay}>
-          <GameLauncher
-            artworkId={state.currentGame}
-            onGameEnd={handleGameEnd}
-          />
-          <button onClick={handleGameEnd}>Reiniciar</button>
-        </div>
-      )}
+      {selectedArtwork && <ArtworkDetail artworkId={selectedArtwork} />}
 
       {currentHallOfFame && showOverlay && (
         <HallOfFameOverlay
