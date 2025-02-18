@@ -14,7 +14,8 @@ const useMuseumNavigation = (scene, camera, renderer) => {
     camera,
     renderer,
     scene,
-    setSelectedTrophy
+    setSelectedTrophy,
+    state.completedGames
   )
 
   if (!state || !dispatch) {
