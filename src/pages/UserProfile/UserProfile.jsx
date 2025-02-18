@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { fetchUserProfile } from '../../api/api'
 import { useGlobalState } from '../../context/useGlobalState'
 import { useNavigate } from 'react-router-dom'
 import UpdateProfileForm from './updateProfile'
+import styles from './UserProfile.module.css'
 
 const UserProfile = () => {
   const { state, dispatch } = useGlobalState()
@@ -11,9 +12,15 @@ const UserProfile = () => {
 
   const [userData, setUserData] = useState(null)
   const [showEditForm, setShowEditForm] = useState(false)
+  const editFormRef = useRef(null)
 
   useEffect(() => {
-    console.log('🏠 Estado actual de usuario en UserProfile:', state.user)
+    if (showEditForm && editFormRef.current) {
+      editFormRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    }
+  }, [showEditForm])
+
+  useEffect(() => {
     if (!state.user) {
       console.warn('⚠️ No hay usuario autenticado, redirigiendo a login...')
       navigate('/')
@@ -33,28 +40,35 @@ const UserProfile = () => {
   }
 
   return (
-    <div>
+    <div className={styles.profileContainer}>
       {userData ? (
-        <div>
+        <>
           <h1>Perfil del Usuario</h1>
-          <p>Nombre: {userData.username}</p>
-          <p>Puntuaciones:</p>
-          <ul>
-            <li>Puzzle: {userData.scores.puzzle}</li>
-            <li>Racer: {userData.scores.racer}</li>
-            <li>Shooter: {userData.scores.shooter}</li>
-          </ul>
-          <button onClick={() => setShowEditForm(!showEditForm)}>
-            {showEditForm ? 'Cancelar' : 'Editar Perfil'}
-          </button>
+          <div className={styles.profileInfo}>
+            <p>
+              <strong>{userData.username}</strong>
+            </p>
+            <ul className={styles.scoresList}>
+              <li>Puzzle: {userData.scores.puzzle}</li>
+              <li>Racer: {userData.scores.racer}</li>
+              <li>Shooter: {userData.scores.shooter}</li>
+            </ul>
+          </div>
+          <div className={styles.profileButtons}>
+            <button onClick={() => setShowEditForm(!showEditForm)}>
+              {showEditForm ? 'Cancelar' : 'Editar Perfil'}
+            </button>
+            <button onClick={handleLogout}>Cerrar Sesión</button>
+          </div>
           {showEditForm && (
-            <UpdateProfileForm
-              username={username}
-              onUpdateSuccess={setUserData}
-            />
+            <div ref={editFormRef} className={styles.updateProfileForm}>
+              <UpdateProfileForm
+                username={username}
+                onUpdateSuccess={setUserData}
+              />
+            </div>
           )}
-          <button onClick={handleLogout}>Cerrar Sesión</button>
-        </div>
+        </>
       ) : (
         <p>Cargando perfil...</p>
       )}

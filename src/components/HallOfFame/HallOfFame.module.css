@@ -22,34 +22,66 @@
   padding-left: 0;
   margin-bottom: 10px;
   width: 100%;
+  background-color: #f9f9f9;
 }
 
 .rankItem {
   margin: 5px 0;
   padding: 5px;
-  background-color: #f9f9f9;
   border-radius: 4px;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  background-color: rgba(100, 58, 44, 0.3);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
-.playerName {
-  font-weight: bold;
-  color: #333;
-}
-
-.playerScore {
-  color: #666;
-}
-
-.userScore {
+.rankCont {
   margin-top: 10px;
   padding: 5px;
   background-color: #fffbe6;
   border: 1px solid #ffeb3b;
   border-radius: 4px;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: space-evenly;
+  text-align: center;
+  position: relative;
+  min-height: 20vh;
+}
+
+.topCont {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgba(100, 58, 44, 0.3);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+}
+
+.topTitle {
+  color: #ffffff;
+  text-decoration-line: underline;
+  text-emphasis: triangle open;
+  text-decoration-style: double;
+  text-decoration-color: #e0ed64;
+  text-emphasis-color: #fff7b4;
+}
+
+.bestUser {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgb(255 244 0 / 33%);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
+  border: 1px solid #ffeb3b;
+  border-radius: 4px;
+}
+.bestUser h3 {
+  color: #795500;
+  text-decoration-line: overline;
+  text-emphasis-style: triangle;
+  text-emphasis-position: under right;
 }
 
 .hallOfFameOverlay {
@@ -58,10 +90,47 @@
   top: 50%;
   transform: translate(-50%, -50%);
   background-color: rgba(0, 0, 0, 0.8);
-  color: white;
   padding: 20px;
   border-radius: 10px;
   z-index: 10;
+  gap: 1rem;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
 }
 
+.nextButton {
+  background-color: var(--background);
+  color: var(--buton-text);
+}
 
+@media (max-height: 786px) {
+  .rankCont {
+    height: 40vh;
+  }
+}
+@media (max-height: 578px) {
+  .rankCont {
+    height: 58vh;
+    width: 55vh;
+  }
+}
+@media (max-height: 498px) {
+  .rankCont {
+    height: 45vh;
+    padding: 0;
+    margin: 0;
+  }
+  .rankCont h2 {
+    font-size: 15px;
+  }
+  .rankCont h3 {
+    font-size: 12px;
+  }
+  .rankList {
+    font-size: 10px;
+  }
+  .bestUser p {
+    font-size: 10px;
+  }
+}

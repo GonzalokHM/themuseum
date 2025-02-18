@@ -1,13 +1,16 @@
 .login {
   position: absolute;
-  top: 60%;
+  top: 54%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(100, 58, 44, 0.3);
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   text-align: center;
+  z-index: 2;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .login input {
@@ -17,6 +20,10 @@
   border: 1px solid #cccccc;
   border-radius: 4px;
   text-align: center;
+}
+
+.registerLogin {
+  color: #d79e55;
 }
 .passwordContainer {
   display: flex;
@@ -94,6 +101,7 @@
 }
 .login button {
   padding: 10px 20px;
+  margin: 2px;
   border: none;
   border-radius: 4px;
   background-color: #007bff;
@@ -108,5 +116,11 @@
 @media (max-width: 420px) {
   .login {
     width: 212px;
+  }
+}
+
+@media (max-height: 786px) {
+  .login {
+    top: 34%;
   }
 }

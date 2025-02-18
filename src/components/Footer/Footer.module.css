@@ -1,22 +1,29 @@
 .footer {
-    background-color: #f0f0f0;
-    padding: 20px;
-    text-align: center;
-    font-size: 14px;
-    color: #333;
-    position: fixed;
-    width: 100%;
-    bottom: 0
+  background: var(--header-footer-bg);
+  padding: 20px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-color);
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  transition: background 0.3s ease;
+}
+
+.link {
+  color: #0077b5;
+  text-decoration: none;
+  margin-left: 5px;
+}
+
+.contactInfo {
+  font-style: italic;
+  margin-left: 5px;
+}
+
+@media (max-height: 786px) {
+  .footer {
+    font-size: 12px;
+    padding: 2px;
   }
-  
-  .link {
-    color: #0077b5;
-    text-decoration: none;
-    margin-left: 5px;
-  }
-  
-  .contactInfo {
-    font-style: italic;
-    margin-left: 5px;
-  }
-  
+}

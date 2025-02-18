@@ -4,12 +4,14 @@ import GameRacer from './Racer/GameRacer.jsx'
 import { useGlobalState } from './../../context/useGlobalState'
 import { getGameScores, updateUserScore } from '../../api/api.js'
 import styles from './GameLauncher.module.css'
+import { useState } from 'react'
 
 const GameLauncher = ({ artworkId, onGameEnd }) => {
   const { dispatch } = useGlobalState()
+  const [gameActive, setGameActive] = useState(true)
 
   const handleGameEnd = async (score, completed) => {
-    if (score === null || isNaN(score)) return
+    if (score === null || isNaN(score) || score <= 0) return
     if (completed || artworkId === 'racer' || artworkId === 'shooter') {
       try {
         const previousScores = await getGameScores(artworkId)
@@ -23,7 +25,10 @@ const GameLauncher = ({ artworkId, onGameEnd }) => {
         console.error('Error al finalizar el juego:', error)
       }
     }
-    onGameEnd()
+    setGameActive(false)
+    setTimeout(() => {
+      onGameEnd()
+    }, 100)
   }
 
   return (
@@ -35,8 +40,12 @@ const GameLauncher = ({ artworkId, onGameEnd }) => {
         Finalizar Juego
       </button>
 
-      {artworkId === 'puzzle' && <MinigamePuzzle onGameEnd={handleGameEnd} />}
-      {artworkId === 'racer' && <GameRacer onGameEnd={handleGameEnd} />}
+      {gameActive && artworkId === 'puzzle' && (
+        <MinigamePuzzle onGameEnd={handleGameEnd} />
+      )}
+      {gameActive && artworkId === 'racer' && (
+        <GameRacer onGameEnd={handleGameEnd} />
+      )}
       {/* {artworkId === 'shooter' && <GameShooter onGameEnd={handleGameEnd} />} */}
     </div>
   )

@@ -7,7 +7,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://backmuseumapi.onrender.com',
+        target: 'http://localhost:4001',
+        // https://backmuseumapi.onrender.com
         changeOrigin: true,
         secure: false
       }

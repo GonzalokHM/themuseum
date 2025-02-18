@@ -20,6 +20,7 @@ const GameRacer = ({ onGameEnd }) => {
   const handleGameOver = async () => {
     if (isGameOver) return
     setIsGameOver(true)
+    cancelAnimationFrame(requestRef.current)
 
     const finalScore = Math.floor(score)
     setTimeout(() => {

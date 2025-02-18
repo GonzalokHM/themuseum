@@ -1,0 +1,121 @@
+.profileContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: var(--card-background);
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  height: 100vh;
+  overflow: overlay;
+}
+
+.profileContainer h1 {
+  font-size: 26px;
+  margin-bottom: 15px;
+  color: #f7b733;
+}
+
+.profileInfo p {
+  font-size: 20px;
+  padding: 1rem;
+  color: var(--text-p);
+}
+
+.scoresList {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  margin-top: 10px;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.scoresList li {
+  background: var(--secondary-color);
+  margin: 6px 0;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 16px;
+  color: var(--textScore-color);
+}
+
+.profileButtons {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.profileButtons button {
+  background: #ff5722;
+  color: white;
+  font-size: 16px;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.profileButtons button:hover {
+  background: #e64a19;
+}
+
+.updateProfileForm {
+  margin-top: 15px;
+  background: #292946;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+.updateProfileForm h2 {
+  font-size: 22px;
+  color: #f7b733;
+  margin-bottom: 10px;
+}
+
+.updateProfileForm label {
+  display: block;
+  text-align: left;
+  font-size: 14px;
+  color: #d1d1e0;
+  margin: 5px 0;
+}
+
+.updateProfileForm input {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  background: #1e1e2f;
+  color: white;
+}
+
+.updateProfileForm button {
+  width: 100%;
+  background: #4caf50;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  margin-top: 10px;
+}
+
+.updateProfileForm button:hover {
+  background: #388e3c;
+}
+
+.updateProfileForm p {
+  margin-top: 10px;
+  font-size: 16px;
+  text-align: center;
+}

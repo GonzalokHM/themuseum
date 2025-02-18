@@ -81,7 +81,9 @@ const UserLogin = () => {
 
   return (
     <div className={styles.login}>
-      <h2>{isRegistering ? 'Regístrate' : 'Iniciar Sesión'}</h2>
+      <h2 className={styles.registerLogin}>
+        {isRegistering ? 'Regístrate' : 'Iniciar Sesión'}
+      </h2>
       <form id='loginRegistform' onSubmit={handleSubmit}>
         <input
           type='text'

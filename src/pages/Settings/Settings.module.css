@@ -1,54 +1,88 @@
-.settings-container {
+/* Contenedor de Ajustes */
+.settingsContainer {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
   padding: 20px;
   background: var(--background);
   color: var(--text-color);
-  border-radius: 8px;
-  width: 300px;
-  margin: auto;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-}
-
-h1 {
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   text-align: center;
+  font-family: 'Arial', sans-serif;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
-div {
-  margin-bottom: 15px;
+/* Título */
+.settingsContainer h1 {
+  font-size: 24px;
+  color: var(--accent-color);
 }
 
-label {
+.groupsCont {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  align-items: center;
+  background-color: cornsilk;
+  width: 100vw;
+  justify-content: space-around;
+}
+
+.settingGroup {
+  margin-bottom: 20px;
+  padding: 10px;
+  background: var(--card-background);
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Etiquetas */
+.settingGroup label {
+  font-size: 16px;
   font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
 }
 
-input[type='range'] {
+/* Controles */
+.settingGroup input[type='range'] {
   width: 100%;
+  cursor: pointer;
 }
 
-button {
+.settingGroup select {
   width: 100%;
   padding: 8px;
-  margin-top: 10px;
-  border: none;
-  border-radius: 4px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: var(--input-background);
+  color: var(--text-color);
   cursor: pointer;
+}
+
+/* Botones */
+.settingsContainer button {
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
   background-color: var(--primary-color);
-  color: white;
+  color: var(--buton-text);
+  transition: background 0.3s ease, transform 0.2s ease;
 }
 
-button:hover {
+.settingsContainer button:hover {
   background-color: var(--primary-dark);
+  transform: scale(1.05);
 }
 
-[data-theme='light'] {
-  --background: white;
-  --text-color: black;
-  --primary-color: #007bff;
-  --primary-dark: #0056b3;
-}
-
+/* Animación al cambiar tema */
+[data-theme='light'],
 [data-theme='dark'] {
-  --background: #222;
-  --text-color: white;
-  --primary-color: #ffcc00;
-  --primary-dark: #d4a500;
+  transition: all 0.3s ease-in-out;
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { getGameScores } from '../../api/api'
+import styles from './HallOfFame.module.css'
 
 const HallOfFame = ({ gameId }) => {
   const [rankings, setRankings] = useState([])
@@ -19,14 +20,14 @@ const HallOfFame = ({ gameId }) => {
   }, [gameId])
 
   return (
-    <div>
+    <div className={styles.rankCont}>
       <h2>Hall of Fame {gameId}</h2>
       {rankings.length > 0 ? (
-        <div>
-          <h3>Top 3 Scores</h3>
-          <ul>
+        <div className={styles.topCont}>
+          <h3 className={styles.topTitle}>Top 3 Scores</h3>
+          <ul className={styles.rankList}>
             {rankings.map((player, index) => (
-              <li key={index}>
+              <li key={index} className={styles.rankItem}>
                 {index + 1}. {player.username}: {player.scores[gameId]}
               </li>
             ))}
@@ -37,8 +38,7 @@ const HallOfFame = ({ gameId }) => {
       )}
 
       {userScore && (
-        // !rankings.some((score) => score.name === userScore.name) &&
-        <div>
+        <div className={styles.bestUser}>
           <h3>Tu mejor puntuación</h3>
           <p>{userScore.scores[gameId]}</p>
         </div>

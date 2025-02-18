@@ -4,6 +4,37 @@ const getAuthHeaders = () => {
   return { Authorization: `Bearer ${token}` }
 }
 
+const fetchWithAuth = async (url, options = {}) => {
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeaders()
+      }
+    })
+
+    if (response.status === 401 || response.status === 403) {
+      console.warn('🔒 Token inválido, cerrando sesión...')
+      localStorage.clear()
+      window.location.href = '/'
+      return { error: 'Sesión expirada. Redirigiendo a Home...' }
+    }
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      return { error: errorData.message || 'Error desconocido en la API' }
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error('❌ Error en la API:', error)
+    return {
+      error: 'No se pudo conectar con el servidor. Verifica tu conexión.'
+    }
+  }
+}
+
 export const registerUser = async (username, password) => {
   try {
     const response = await fetch('api/auth/register', {
@@ -55,21 +86,15 @@ export const fetchUserProfile = async (username) => {
     return null
   }
   try {
-    const response = await fetch(`api/users/profile/${username}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...getAuthHeaders()
-      }
+    const response = await fetchWithAuth(`api/users/profile/${username}`, {
+      method: 'GET'
     })
-
-    if (!response.ok) {
-      throw new Error('No autorizado')
+    if (response.error) {
+      console.error('❌ Error al obtener el perfil:', response.error)
+      return null
     }
 
-    const userData = await response.json()
-    console.log('✅Datos del usuario:', userData)
-    return userData
+    return response
   } catch (error) {
     console.error('❌Error al obtener el perfil:', error)
     return null
@@ -78,14 +103,13 @@ export const fetchUserProfile = async (username) => {
 
 export const updateUserProfile = async (username, newPassword, email) => {
   try {
-    const response = await fetch(`/api/users/profile/${username}/update`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        ...getAuthHeaders()
-      },
-      body: JSON.stringify({ newPassword, email })
-    })
+    const response = await fetchWithAuth(
+      `/api/users/profile/${username}/update`,
+      {
+        method: 'PUT',
+        body: JSON.stringify({ newPassword, email })
+      }
+    )
 
     const data = await response.json()
 
@@ -104,20 +128,16 @@ export const updateUserProfile = async (username, newPassword, email) => {
 
 export const getGameScores = async (game) => {
   try {
-    const response = await fetch(`api/score/${game}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...getAuthHeaders()
-      }
+    const response = await fetchWithAuth(`api/score/${game}`, {
+      method: 'GET'
     })
 
-    if (!response.ok) {
-      throw new Error('Error obteniendo el ranking')
+    if (response.error) {
+      console.error('❌ Error al obtener los puntajes:', response.error)
+      return null
     }
 
-    const result = await response.json()
-    return result
+    return response
   } catch (error) {
     console.error('Error al obtener los puntajes:', error)
     return null
@@ -126,12 +146,8 @@ export const getGameScores = async (game) => {
 
 export const updateUserScore = async (game, score) => {
   try {
-    const response = await fetch('api/score/update-score', {
+    const response = await fetchWithAuth('api/score/update', {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        ...getAuthHeaders()
-      },
       body: JSON.stringify({ game, score })
     })
 

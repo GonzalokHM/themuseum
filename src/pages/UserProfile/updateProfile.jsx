@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { updateUserProfile } from '../../api/api'
+import styles from './UserProfile.module.css'
 
 const UpdateProfileForm = ({ username, onUpdateSuccess }) => {
   const [newPassword, setNewPassword] = useState('')
@@ -11,7 +12,6 @@ const UpdateProfileForm = ({ username, onUpdateSuccess }) => {
     setLoading(true)
     setMessage('')
 
-    const token = localStorage.getItem('token')
     const updatedData = await updateUserProfile(
       username,
       newPassword || null,
@@ -29,7 +29,7 @@ const UpdateProfileForm = ({ username, onUpdateSuccess }) => {
   }
 
   return (
-    <div>
+    <div className={styles.updateProfileForm}>
       <h2>Actualizar Perfil</h2>
       <label>
         Nueva Contraseña:

@@ -1,15 +1,10 @@
 import { useState, useEffect } from 'react'
+import styles from './Settings.module.css'
 
-const Settings = () => {
+const Settings = ({ theme, setTheme }) => {
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [volume, setVolume] = useState(50)
   const [graphicsQuality, setGraphicsQuality] = useState('Alta')
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light')
-
-  useEffect(() => {
-    document.body.setAttribute('data-theme', theme)
-    localStorage.setItem('theme', theme)
-  }, [theme])
 
   useEffect(() => {
     localStorage.setItem('soundEnabled', soundEnabled)
@@ -25,45 +20,49 @@ const Settings = () => {
   }
 
   return (
-    <div className='settings-container'>
+    <div className={styles.settingsContainer}>
       <h1>⚙️ Panel de Ajustes</h1>
 
-      <div>
-        <label>
-          🔊 Sonido:
+      <div className={styles.groupsCont}>
+        <div className={styles.settingGroup}>
+          <label>
+            🔊 Sonido:
+            <input
+              type='checkbox'
+              checked={soundEnabled}
+              onChange={() => setSoundEnabled(!soundEnabled)}
+            />
+          </label>
           <input
-            type='checkbox'
-            checked={soundEnabled}
-            onChange={() => setSoundEnabled(!soundEnabled)}
+            type='range'
+            min='0'
+            max='100'
+            value={volume}
+            onChange={(e) => setVolume(e.target.value)}
           />
-        </label>
-        <input
-          type='range'
-          min='0'
-          max='100'
-          value={volume}
-          onChange={(e) => setVolume(e.target.value)}
-        />
-        <span>🎚️ Volumen: {volume}%</span>
-      </div>
+          <span>🎚️ Volumen: {volume}%</span>
+        </div>
 
-      <div>
-        <label>🎮 Calidad Gráfica: </label>
-        <select
-          value={graphicsQuality}
-          onChange={(e) => setGraphicsQuality(e.target.value)}
-        >
-          <option value='Baja'>Baja</option>
-          <option value='Media'>Media</option>
-          <option value='Alta'>Alta</option>
-        </select>
-      </div>
+        <div className={styles.settingGroup}>
+          <label>🎮 Calidad Gráfica: </label>
+          <select
+            value={graphicsQuality}
+            onChange={(e) => setGraphicsQuality(e.target.value)}
+          >
+            <option value='Baja'>Baja</option>
+            <option value='Media'>Media</option>
+            <option value='Alta'>Alta</option>
+          </select>
+        </div>
 
-      <div>
-        <label>🌙 Tema: </label>
-        <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
-          {theme === 'light' ? 'Activar Modo Oscuro' : 'Activar Modo Claro'}
-        </button>
+        <div className={styles.settingGroup}>
+          <label>🌙 Tema: </label>
+          <button
+            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+          >
+            {theme === 'light' ? 'Activar Modo Oscuro' : 'Activar Modo Claro'}
+          </button>
+        </div>
       </div>
 
       <button onClick={resetSettings}>🔄 Restablecer Ajustes</button>

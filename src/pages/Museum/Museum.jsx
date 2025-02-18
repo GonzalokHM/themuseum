@@ -2,7 +2,6 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import * as THREE from 'three'
 import useMuseumNavigation from '../../hooks/useMuseumNavigation'
 import { useGlobalState } from '../../context/useGlobalState'
-import GameLauncher from '../../components/Games/GameLauncher'
 import HallOfFameOverlay from '../../components/HallOfFame/HallOfFameOverlay'
 import styles from './Museum.module.css'
 import {
@@ -33,6 +32,26 @@ const Museum = () => {
   } = useMuseumNavigation(scene, camera, renderer)
 
   const hallOfFameIds = ['hallpuzzle', 'hallracer', 'hallshooter']
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (renderer && camera) {
+        const container = mountRef.current
+        if (container) {
+          const width = container.clientWidth
+          const height = container.clientHeight
+          renderer.setSize(width, height)
+          camera.aspect = width / height
+          camera.updateProjectionMatrix()
+        }
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [renderer, camera])
 
   useEffect(() => {
     if (!mountRef.current) return
