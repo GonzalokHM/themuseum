@@ -88,7 +88,6 @@ const GameRacer = ({ onGameEnd }) => {
         }
       }
 
-      // Actualizar el HUD solo si hay cambios en la puntuación, vidas o velocidad
       setScore(Math.floor(car.score))
       if (car.lives !== lives) setLives(car.lives)
       setSpeed(car.velocity)

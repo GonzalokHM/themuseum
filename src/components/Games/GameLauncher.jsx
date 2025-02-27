@@ -11,7 +11,11 @@ const GameLauncher = ({ artworkId, onGameEnd }) => {
   const [gameActive, setGameActive] = useState(true)
 
   const handleGameEnd = async (score, completed) => {
-    if (score === null || isNaN(score) || score <= 0) return
+    if (score === null || isNaN(score) || score <= 0) {
+      setGameActive(false)
+      onGameEnd()
+      return
+    }
     if (completed || artworkId === 'racer' || artworkId === 'shooter') {
       try {
         const previousScores = await getGameScores(artworkId)
@@ -26,9 +30,7 @@ const GameLauncher = ({ artworkId, onGameEnd }) => {
       }
     }
     setGameActive(false)
-    setTimeout(() => {
-      onGameEnd()
-    }, 100)
+    onGameEnd()
   }
 
   return (
