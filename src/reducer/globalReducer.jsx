@@ -46,9 +46,11 @@ export const reducer = (state, action) => {
         ...state.completedGames,
         [action.payload]: true
       }
-      updatedCompletedGames.allGames = Object.values(
-        updatedCompletedGames
-      ).every(Boolean)
+      updatedCompletedGames.allGames = Boolean(
+        updatedCompletedGames.puzzle &&
+          updatedCompletedGames.racer &&
+          updatedCompletedGames.shooter
+      )
 
       localStorage.setItem(
         'completedGames',

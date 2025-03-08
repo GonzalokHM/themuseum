@@ -118,10 +118,10 @@ const GameShooter = ({ onGameEnd }) => {
     }
     renderer.domElement.addEventListener('click', handleClick)
 
-    // Juego finaliza por tiempo (20 segundos)
+    // Juego finaliza por tiempo (10 segundos)
     const gameTimeout = setTimeout(() => {
       onGameEnd(scoreRef.current, true)
-    }, 20000)
+    }, 10000)
 
     return () => {
       clearTimeout(gameTimeout)

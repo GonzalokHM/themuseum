@@ -48,7 +48,6 @@ const GameRacer = ({ onGameEnd }) => {
       const finalScore = Math.floor(car.score)
 
       onGameEnd(finalScore, true)
-      console.log('game racer handleGameOver', finalScore, score)
     }
 
     const animate = () => {

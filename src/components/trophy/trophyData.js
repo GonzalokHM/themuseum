@@ -25,6 +25,7 @@ const getTrophiesData = (completedGames) => [
   },
   {
     id: 'trophy4All',
+    gameId: 'allGames',
     position: [3, 0, -3],
     gameCompleted: completedGames.allGames,
     gameName: 'AllGames',
