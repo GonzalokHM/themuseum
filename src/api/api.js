@@ -1,3 +1,5 @@
+const apiUrl = 'https://backmuseumapi.onrender.com/api/' || '/api'
+
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token')
   if (!token) return {}
@@ -37,7 +39,7 @@ const fetchWithAuth = async (url, options = {}) => {
 
 export const registerUser = async (username, password) => {
   try {
-    const response = await fetch('api/auth/register', {
+    const response = await fetch(`${apiUrl}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
@@ -58,7 +60,7 @@ export const registerUser = async (username, password) => {
 
 export const loginUser = async (username, password) => {
   try {
-    const response = await fetch('api/auth/login', {
+    const response = await fetch(`${apiUrl}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -86,9 +88,12 @@ export const fetchUserProfile = async (username) => {
     return null
   }
   try {
-    const response = await fetchWithAuth(`api/users/profile/${username}`, {
-      method: 'GET'
-    })
+    const response = await fetchWithAuth(
+      `${apiUrl}/users/profile/${username}`,
+      {
+        method: 'GET'
+      }
+    )
     if (response.error) {
       console.error('❌ Error al obtener el perfil:', response.error)
       return null
@@ -104,7 +109,7 @@ export const fetchUserProfile = async (username) => {
 export const updateUserProfile = async (username, newPassword, email) => {
   try {
     const response = await fetchWithAuth(
-      `/api/users/profile/${username}/update`,
+      `/${apiUrl}/users/profile/${username}/update`,
       {
         method: 'PUT',
         body: JSON.stringify({ newPassword, email })
@@ -128,7 +133,7 @@ export const updateUserProfile = async (username, newPassword, email) => {
 
 export const getGameScores = async (game) => {
   try {
-    const response = await fetchWithAuth(`api/score/${game}`, {
+    const response = await fetchWithAuth(`${apiUrl}/score/${game}`, {
       method: 'GET'
     })
 
@@ -146,7 +151,7 @@ export const getGameScores = async (game) => {
 
 export const updateUserScore = async (game, score) => {
   try {
-    const response = await fetchWithAuth('api/score/update', {
+    const response = await fetchWithAuth(`${apiUrl}/score/update`, {
       method: 'PUT',
       body: JSON.stringify({ game, score })
     })
