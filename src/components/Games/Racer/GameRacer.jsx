@@ -17,17 +17,6 @@ const GameRacer = ({ onGameEnd }) => {
   const requestRef = useRef(null)
   const rendererRef = useRef(null)
 
-  const handleGameOver = async () => {
-    if (isGameOver) return
-    setIsGameOver(true)
-    cancelAnimationFrame(requestRef.current)
-
-    const finalScore = Math.floor(score)
-    setTimeout(() => {
-      onGameEnd(finalScore, true)
-    }, 1500)
-  }
-
   useEffect(() => {
     const { scene, camera, renderer, track } = initScene(mountRef.current)
     rendererRef.current = renderer
@@ -49,6 +38,17 @@ const GameRacer = ({ onGameEnd }) => {
       initObstacles(scene, mainCurve, track.trackWidth)
     } else {
       console.error('No initial sections found')
+    }
+
+    const handleGameOver = async () => {
+      if (isGameOver) return
+      setIsGameOver(true)
+      // setInterval
+      cancelAnimationFrame(requestRef.current)
+      const finalScore = Math.floor(car.score)
+
+      onGameEnd(finalScore, true)
+      console.log('game racer handleGameOver', finalScore, score)
     }
 
     const animate = () => {
@@ -112,7 +112,7 @@ const GameRacer = ({ onGameEnd }) => {
       {isGameOver && (
         <div className='game-over-overlay'>
           <h1>Game Over !</h1>
-          <p>Score:{Math.floor(score)}meters</p>
+          <p>Score:{score}meters</p>
         </div>
       )}
     </div>

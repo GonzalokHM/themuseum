@@ -2,12 +2,14 @@ const getTrophiesData = (completedGames) => [
   {
     id: 'trophy1Puzzle',
     position: [-3, 0, -3],
+    gameId: 'puzzle',
     gameCompleted: completedGames.puzzle,
     gameName: 'Puzzle',
     cupMaterialType: 'bronze'
   },
   {
     id: 'trophy2Racer',
+    gameId: 'racer',
     position: [-1, 0, -3],
     gameCompleted: completedGames.racer,
     gameName: 'Racer',
@@ -15,6 +17,7 @@ const getTrophiesData = (completedGames) => [
   },
   {
     id: 'trophy3shooter',
+    gameId: 'shooter',
     position: [1, 0, -3],
     gameCompleted: completedGames.shooter,
     gameName: 'Shooter',

@@ -151,11 +151,11 @@ export const updateUserScore = async (game, score) => {
       body: JSON.stringify({ game, score })
     })
 
-    if (!response.ok) {
+    if (response.error) {
       throw new Error('Error al actualizar la puntuación')
     }
 
-    return await response.json()
+    return response
   } catch (error) {
     console.error('Error al actualizar la puntuación:', error)
     return null

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import useMuseumNavigation from '../../hooks/useMuseumNavigation'
 import { useGlobalState } from '../../context/useGlobalState'
@@ -128,6 +128,7 @@ const Museum = () => {
           <Trophy
             key={trophy.id}
             id={trophy.id}
+            gameId={trophy.gameId}
             position={trophy.position}
             gameCompleted={trophy.gameCompleted}
             gameName={trophy.gameName}

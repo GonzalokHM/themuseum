@@ -10,12 +10,14 @@ const useMuseumNavigation = (scene, camera, renderer) => {
   const [mouse] = useState(new THREE.Vector2())
   const animationRef = useRef()
   const { state, dispatch } = useGlobalState()
+  const lockTexture = new THREE.TextureLoader().load('/img/lock.png')
   const { handleTrophyClick } = useTrophyInteraction(
     camera,
     renderer,
     scene,
     setSelectedTrophy,
-    state.completedGames
+    state.completedGames,
+    lockTexture
   )
 
   if (!state || !dispatch) {

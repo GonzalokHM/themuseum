@@ -5,6 +5,7 @@ import { useGlobalState } from './../../context/useGlobalState'
 import { getGameScores, updateUserScore } from '../../api/api.js'
 import styles from './GameLauncher.module.css'
 import { useState } from 'react'
+import GameShooter from './Shooter/GameShooter.jsx'
 
 const GameLauncher = ({ artworkId, onGameEnd }) => {
   const { dispatch } = useGlobalState()
@@ -12,17 +13,41 @@ const GameLauncher = ({ artworkId, onGameEnd }) => {
 
   const handleGameEnd = async (score, completed) => {
     if (score === null || isNaN(score) || score <= 0) {
+      console.log('handleGAmeEnd nul score', score)
       setGameActive(false)
-      onGameEnd()
+      onGameEnd(false)
       return
+    }
+    let finalScore = score
+    if (artworkId === 'puzzle') {
+      const minutes = Math.floor(score / 60)
+      const seconds = score % 60
+      finalScore = `${minutes.toString().padStart(2, '0')}:${seconds
+        .toString()
+        .padStart(2, '0')}`
     }
     if (completed || artworkId === 'racer' || artworkId === 'shooter') {
       try {
         const previousScores = await getGameScores(artworkId)
         const bestPreviousScore =
           previousScores?.userScore?.scores[artworkId] || null
-        if (!bestPreviousScore || score > parseFloat(bestPreviousScore)) {
-          await updateUserScore(artworkId, Math.floor(score))
+        let shouldUpdate = false
+        if (!bestPreviousScore) {
+          shouldUpdate = true
+        } else if (artworkId === 'puzzle') {
+          const [prevMin, prevSec] = bestPreviousScore.split(':').map(Number)
+          const prevTotalSeconds = prevMin * 60 + prevSec
+          if (score < prevTotalSeconds) {
+            shouldUpdate = true
+          }
+        } else {
+          if (score > parseFloat(bestPreviousScore)) {
+            shouldUpdate = true
+          }
+        }
+
+        if (shouldUpdate) {
+          await updateUserScore(artworkId, finalScore)
         }
         dispatch({ type: 'COMPLETE_GAME', payload: artworkId })
       } catch (error) {
@@ -30,7 +55,7 @@ const GameLauncher = ({ artworkId, onGameEnd }) => {
       }
     }
     setGameActive(false)
-    onGameEnd()
+    onGameEnd(completed)
   }
 
   return (
@@ -48,7 +73,9 @@ const GameLauncher = ({ artworkId, onGameEnd }) => {
       {gameActive && artworkId === 'racer' && (
         <GameRacer onGameEnd={handleGameEnd} />
       )}
-      {/* {artworkId === 'shooter' && <GameShooter onGameEnd={handleGameEnd} />} */}
+      {gameActive && artworkId === 'shooter' && (
+        <GameShooter onGameEnd={handleGameEnd} />
+      )}
     </div>
   )
 }

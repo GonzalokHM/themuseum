@@ -41,8 +41,10 @@ const ArtworkDetail = ({ artworkId }) => {
         ) : (
           <GameLauncher
             artworkId={artworkId}
-            onGameEnd={() => {
-              dispatch({ type: 'END_GAME' })
+            onGameEnd={(completed) => {
+              if (!completed) {
+                dispatch({ type: 'END_GAME' })
+              }
               setIsGameActive(false)
             }}
           />

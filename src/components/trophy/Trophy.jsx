@@ -6,6 +6,7 @@ import { TextGeometry } from 'three/addons/geometries/TextGeometry'
 
 const Trophy = ({
   id,
+  gameId,
   position,
   completedGames,
   scene,
@@ -103,7 +104,7 @@ const Trophy = ({
 
       const trophy = createTrophyGeometry()
       trophy.position.set(...position)
-      trophy.userData = { id, completedGames, type: 'trophy' }
+      trophy.userData = { id, gameId, type: 'trophy' }
       trophyRef.current = trophy
 
       const textGeometry = new TextGeometry(gameName || id, {

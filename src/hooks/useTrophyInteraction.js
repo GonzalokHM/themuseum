@@ -6,7 +6,8 @@ const useTrophyInteraction = (
   renderer,
   scene,
   setSelectedTrophy,
-  completedGames
+  completedGames,
+  lockTexture
 ) => {
   const moveCameraToTrophy = useCallback(
     (trophy, onComplete) => {
@@ -45,7 +46,7 @@ const useTrophyInteraction = (
 
   const rotateTrophy = useCallback(
     (trophy) => {
-      const duration = 2000
+      const duration = 5000
       const startTime = performance.now()
 
       const animateRotation = (time) => {
@@ -70,35 +71,32 @@ const useTrophyInteraction = (
     (trophy) => {
       setSelectedTrophy(trophy)
       moveCameraToTrophy(trophy, () => {
-        const isCompleted = completedGames[trophy.userData.id] || false
+        const isCompleted = completedGames[trophy.userData.gameId] || false
 
         console.log('Estado del juego en completedGames:', completedGames)
         console.log(
           'Trofeo seleccionado:',
-          trophy.userData.id,
+          trophy.userData,
           'Completado:',
           isCompleted
         )
 
         if (!isCompleted) {
-          const textureLoader = new THREE.TextureLoader()
-          const lockImg = textureLoader.load('/img/lock.png')
-
           const lockGeometry = new THREE.PlaneGeometry(1, 1.8)
           const lockMaterial = new THREE.MeshBasicMaterial({
-            map: lockImg,
+            map: lockTexture,
             side: THREE.DoubleSide,
-            transparent: true
+            transparent: true,
+            depthTest: false
           })
           const lock = new THREE.Mesh(lockGeometry, lockMaterial)
           lock.userData = { type: 'lock' }
           lock.position.set(0, 0, 0.55)
+          lock.renderOrder = 999
           trophy.add(lock)
-          console.log('Lock agregado al trofeo:', lock)
 
-          showLockOverlay()
+          console.log('Lock agregado al trofeo:', lock)
         } else {
-          removeLockOverlay()
           rotateTrophy(trophy)
         }
       })
@@ -106,31 +104,7 @@ const useTrophyInteraction = (
     [moveCameraToTrophy, rotateTrophy, setSelectedTrophy, completedGames]
   )
 
-  const showLockOverlay = () => {
-    const lockElement = document.createElement('div')
-    lockElement.style.position = 'absolute'
-    lockElement.style.top = '50%'
-    lockElement.style.left = '50%'
-    lockElement.style.transform = 'translate(-50%, -50%)'
-    lockElement.style.width = '200px'
-    lockElement.style.height = '200px'
-    lockElement.style.backgroundImage = 'url(/img/lock.png)'
-    lockElement.style.opacity = '0.8'
-    lockElement.style.backgroundSize = 'cover'
-    lockElement.style.zIndex = '100'
-    lockElement.id = 'lockOverlay'
-
-    document.body.appendChild(lockElement)
-  }
-
   return { handleTrophyClick }
-}
-
-const removeLockOverlay = () => {
-  const lockElement = document.getElementById('lockOverlay')
-  if (lockElement) {
-    document.body.removeChild(lockElement)
-  }
 }
 
 export default useTrophyInteraction

@@ -33,6 +33,7 @@
 
 .settingGroup {
   margin-bottom: 20px;
+  margin-top: 20px;
   padding: 10px;
   background: var(--card-background);
   border-radius: 8px;

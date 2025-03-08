@@ -1,5 +1,4 @@
 import * as THREE from 'three'
-import Trophy from '../../components/trophy/Trophy'
 
 const createWalls = (scene) => {
   const wallGeometry = new THREE.PlaneGeometry(10, 5)
