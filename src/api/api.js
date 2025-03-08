@@ -1,5 +1,5 @@
-const apiUrl = 'https://backmuseumapi.onrender.com/api/' || '/api'
-
+const apiUrl = '/api'
+// 'https://backmuseumapi.onrender.com/api' ||
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token')
   if (!token) return {}

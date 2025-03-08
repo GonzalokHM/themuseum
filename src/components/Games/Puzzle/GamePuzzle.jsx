@@ -58,22 +58,20 @@ const MinigamePuzzle = ({ onGameEnd }) => {
       <h2>Rompecabezas</h2>
       {isSolved ? (
         <p>¡Felicidades, has resuelto el rompecabezas!</p>
-      ) : null
-      // // Dev Button
-      // (
-      //   <button
-      //     onClick={() => {
-      //       clearInterval(timerRef.current)
-      //       setIsSolved(true)
-      //       const totalSeconds =
-      //         elapsedTime.minutes * 60 + elapsedTime.seconds
-      //       onGameEnd(totalSeconds, true)
-      //     }}
-      //   >
-      //     Resolver Puzzle
-      //   </button>
-      // )
-      }
+      ) : (
+        //  null
+        // // Dev Button
+        <button
+          onClick={() => {
+            clearInterval(timerRef.current)
+            setIsSolved(true)
+            const totalSeconds = elapsedTime.minutes * 60 + elapsedTime.seconds
+            onGameEnd(totalSeconds, true)
+          }}
+        >
+          Resolver Puzzle
+        </button>
+      )}
       <div id='timer'>
         {elapsedTime.minutes} min {elapsedTime.seconds} s
       </div>

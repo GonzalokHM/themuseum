@@ -80,24 +80,33 @@ const useTrophyInteraction = (
           'Completado:',
           isCompleted
         )
+        const existingLock = trophy.children.find(
+          (child) => child.userData && child.userData.type === 'lock'
+        )
 
         if (!isCompleted) {
-          const lockGeometry = new THREE.PlaneGeometry(1, 1.8)
-          const lockMaterial = new THREE.MeshBasicMaterial({
-            map: lockTexture,
-            side: THREE.DoubleSide,
-            transparent: true,
-            depthTest: false
-          })
-          const lock = new THREE.Mesh(lockGeometry, lockMaterial)
-          lock.userData = { type: 'lock' }
-          lock.position.set(0, 0, 0.55)
-          lock.renderOrder = 999
-          trophy.add(lock)
+          if (!existingLock) {
+            const lockGeometry = new THREE.PlaneGeometry(1, 1.8)
+            const lockMaterial = new THREE.MeshBasicMaterial({
+              map: lockTexture,
+              side: THREE.DoubleSide,
+              transparent: true,
+              depthTest: false
+            })
+            const lock = new THREE.Mesh(lockGeometry, lockMaterial)
+            lock.userData = { type: 'lock' }
+            lock.position.set(0, 0, 0.55)
+            lock.renderOrder = 999
+            lock.raycast = () => {}
+            trophy.add(lock)
 
-          console.log('Lock agregado al trofeo:', lock)
+            console.log('Lock agregado al trofeo:', lock)
+          }
         } else {
           rotateTrophy(trophy)
+          if (existingLock) {
+            trophy.remove(existingLock)
+          }
         }
       })
     },

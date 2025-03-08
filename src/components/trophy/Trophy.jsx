@@ -132,7 +132,19 @@ const Trophy = ({
     }
   }, [position, id, scene, completedGames, gameName, cupMaterialType])
 
-  return null // No renderiza JSX en el DOM de React, todo es gestionado en Three.js
+  useEffect(() => {
+    if (completedGames && trophyRef.current) {
+      const lock = trophyRef.current.children.find(
+        (child) => child.userData && child.userData.type === 'lock'
+      )
+      console.log(jjjjjjjjjjjj)
+      if (lock) {
+        trophyRef.current.remove(lock)
+      }
+    }
+  }, [completedGames])
+
+  return null
 }
 
 Trophy.propTypes = {
